@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>英単語学習サイト</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <style>
+    body { font-family: Arial, Helvetica, sans-serif; margin: 20px; }
+    textarea, input { width: 100%; box-sizing: border-box; font-size: 16px; padding: 8px; margin: 8px 0; }
+    button { padding: 8px 12px; margin: 4px; font-size: 16px; cursor: pointer; }
+    button.active { opacity: 0.5; }
+    .hide { display: none; }
+    #prompt { font-size: 24px; font-weight: bold; margin: 16px 0 0; }
+    #playAudio { font-size: 24px; background: none; border: none; cursor: pointer; vertical-align: middle; }
+    #resultArea { margin-top: 16px; font-size: 18px; }
+    #quizArea { margin-top: 20px; }
+  </style>
+</head>
+<body>
+
+<div id="setupArea">
+  <h2>語彙を入力（単語↵日本語↵カタカナ↵語源解説↵英文↵訳文…↵↵で区切り）</h2>
+  <textarea id="vocabInput" rows="10" placeholder="Hello\nこんにちは\nハロー\n接頭辞: 無し / 接尾辞: o\nHello! How are you today?\nこんにちは！今日はどうですか？\nHello, my name is Tom.\nこんにちは、私の名前はトムです。\n\nApple\nりんご\nアップル\n接尾辞: -le（小さいもの）\nThis is an apple.\nこれはりんごです。\nI like eating apples.\n私はりんごを食べるのが好きです。"></textarea>
+  <div>
+    <button id="modeEnJa">英語から日本語</button>
+    <button id="modeJaEn">日本語から英語</button>
+    <button id="insertExample">📋 入力例を挿入</button>
+    <p style="color:gray;font-size:14px;">形式: 単語→日本語→カタカナ→語源→例文（英→日）を最低1セット以上入力してください。</p>
+  </div>
+</div>
+
+<div id="quizArea" class="hide">
+  <p id="prompt"></p><button id="playAudio" title="もう一度聞く">🔊</button>
+  <input id="answerInput" placeholder="ここに回答を入力してEnter">
+  <div id="resultArea"></div>
+  <button id="skipBtn">打ち直しなし</button>
+  <button id="backBtn">入力欄に戻る</button>
+</div>
+
+<script>
+(()=>{'use strict';
+const vocabInput=document.getElementById('vocabInput');
+const modeEnJa=document.getElementById('modeEnJa');
+const modeJaEn=document.getElementById('modeJaEn');
+const quizArea=document.getElementById('quizArea');
+const promptEl=document.getElementById('prompt');
+const playAudio=document.getElementById('playAudio');
+const answerIn=document.getElementById('answerInput');
+const resultArea=document.getElementById('resultArea');
+const skipBtn=document.getElementById('skipBtn');
+const backBtn=document.getElementById('backBtn');
+const insertExample=document.getElementById('insertExample');
+
+insertExample.addEventListener('click', () => {
+  vocabInput.value = `Hello\nこんにちは\nハロー\n接頭辞: なし / 接尾辞: o（感動表現）\nHello! How are you today?\nこんにちは！今日はどうですか？\nHello, my name is Tom.\nこんにちは、私の名前はトムです。\n\nApple\nりんご\nアップル\n接頭辞: なし / 接尾辞: -le（小さいものを表す）\nThis is an apple.\nこれはりんごです。\nI like eating apples.\n私はりんごを食べるのが好きです。`;
+});
+
+let wordList=[],current=0,mode='en-ja',active=false;
+let skipAlways=false;
+let waitingForNext=false;
+let currentItem=null;
+let mustRetry=false;
+
+let defaultVoice=null;
+function setDefaultVoice(){
+  const voices=speechSynthesis.getVoices();
+  if(!voices.length||defaultVoice) return;
+  defaultVoice=voices.find(v=>/^en[-_]/i.test(v.lang)&&/female/i.test(v.name))||
+                voices.find(v=>/^en[-_]/i.test(v.lang))||voices[0];
+}
+setDefaultVoice();
+speechSynthesis.onvoiceschanged=setDefaultVoice;
+
+function speak(text){
+  if(!text) return;
+  if(speechSynthesis.speaking) speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(text);
+  u.lang='en-US';
+  if(defaultVoice) u.voice=defaultVoice;
+  speechSynthesis.speak(u);
+}
+
+modeEnJa.addEventListener('click',()=>startQuiz('en-ja'));
+modeJaEn.addEventListener('click',()=>startQuiz('ja-en'));
+playAudio.addEventListener('click',()=>{ if(currentItem) speak(currentItem.en); });
+
+skipBtn.addEventListener('click',()=>{
+  skipAlways = !skipAlways;
+  skipBtn.classList.toggle('active');
+});
+
+backBtn.addEventListener('click', () => {
+  active = false;
+  quizArea.classList.add('hide');
+  document.getElementById('setupArea').classList.remove('hide');
+  vocabInput.focus();
+});
+
+answerIn.addEventListener('keydown',e=>{
+  if(e.key==='Enter'){
+    e.preventDefault();
+    const ans = answerIn.value.trim();
+    const correct = mode==='en-ja' ? ans === currentItem.ja : ans.toLowerCase() === currentItem.en.toLowerCase();
+
+    if(waitingForNext){
+      if(skipAlways || !mustRetry || correct){
+        mustRetry = false;
+        nextQuestion();
+      }else{
+        speak(currentItem.en);
+        const wrongAnsLine = `<div style=\"color:gray;\">あなたの回答: ${ans}</div>`;
+        const match = resultArea.innerHTML.match(/<br><strong>(.*?)<\/strong>/);
+        if (match) {
+          resultArea.innerHTML = resultArea.innerHTML.replace(/<div style=\"color:gray;\">あなたの回答: .*?<\/div>/, '');
+          resultArea.innerHTML = resultArea.innerHTML.replace(/<div style=\"color:red;\">.*?<\/div>/, `<div style=\"color:red\">❌ もう一度正しく入力してからEnterを押してください。</div>`);
+          resultArea.innerHTML = resultArea.innerHTML.replace(match[0], `<br><strong>${match[1]}</strong>${wrongAnsLine}`);
+        }
+        answerIn.value = '';
+        setTimeout(()=>answerIn.focus(), 0);
+      }
+    }else{
+      showResult(correct, ans);
+    }
+  }
+});
+
+answerIn.addEventListener('click', () => { setTimeout(() => answerIn.focus(), 0); });
+
+function startQuiz(m){
+  mode=m;
+  if(!parseInput()){ alert('単語が登録されていません'); return; }
+  current=0;
+  document.getElementById('setupArea').classList.add('hide');
+  quizArea.classList.remove('hide');
+  active=true;
+  nextQuestion();
+}
+
+function parseInput(){
+  wordList=[];
+  vocabInput.value.trim().split(/\r?\n\s*\r?\n/).forEach(block=>{
+    const lines=block.split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
+    if(lines.length>=4){
+      const en=lines[0];
+      const ja=lines[1];
+      const kana=lines[2] || '';
+      const affix=lines[3] || '';
+      const examples=[];
+      for(let i=4;i<lines.length-1;i+=2){
+        examples.push({en:lines[i], ja:lines[i+1]});
+      }
+      wordList.push({en,ja,kana,affix,examples});
+    }
+  });
+  return wordList.length>0;
+}
+
+function nextQuestion(){
+  if(current>=wordList.length) return endQuiz();
+  resultArea.innerHTML='';
+  answerIn.value='';
+  waitingForNext = false;
+  mustRetry = false;
+  setTimeout(()=>answerIn.focus(), 0);
+  currentItem = wordList[current];
+  promptEl.textContent=mode==='en-ja'?currentItem.en:currentItem.ja;
+}
+
+function showResult(correct, userInput){
+  speak(currentItem.en);
+  const text = mode==='en-ja'?currentItem.ja:currentItem.en;
+  const ex = currentItem.examples.length ?
+    '<ul style="margin:8px 0 0 20px;padding:0;">' +
+    currentItem.examples.map(t => `<li>${t.en}<br><small style="color:gray;">${t.ja}</small></li>`).join('') +
+    '</ul>' : '<div>(例文なし)</div>';
+  const kanaLine = currentItem.kana ? `<div>🔤 カタカナ: ${currentItem.kana}</div>` : '';
+  const affixLine = currentItem.affix ? `<div>📚 語源: ${currentItem.affix}</div>` : '';
+  const wrongAns = !correct ? `<div style="color:gray;">あなたの回答: ${userInput}</div>` : '';
+
+  resultArea.innerHTML = `
+    ${correct ? '✅ 正解！' : '❌ 不正解'}
+    <br><strong>${text}</strong>
+    ${wrongAns}
+    ${kanaLine}
+    ${affixLine}
+    ${ex}
+    <br><em>${correct || skipAlways ? 'Enterで次へ' : '正しい単語を再入力してEnterで次へ'}</em>
+  `;
+  waitingForNext = true;
+  mustRetry = !correct && !skipAlways;
+  if (correct || skipAlways) current++;
+  answerIn.value = '';
+  setTimeout(()=>answerIn.focus(), 0);
+}
+
+function endQuiz(){
+  active=false;
+  promptEl.textContent='';
+  resultArea.textContent='';
+  quizArea.classList.add('hide');
+  document.getElementById('setupArea').classList.remove('hide');
+  vocabInput.focus();
+  alert('すべての単語を出題し終えました！');
+}
+})();
+</script>
+</body>
+</html>
