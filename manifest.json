@@ -1,0 +1,18 @@
+{
+  "name": "Ninimaths",
+  "short_name": "Ninimaths",
+  "description": "暗算練習アプリ",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#EEEEEE",
+  "theme_color": "#2C6878",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

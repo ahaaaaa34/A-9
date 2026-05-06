@@ -2,207 +2,715 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>英単語学習サイト</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#2C6878">
+  <title>Ninimaths</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Ninimaths">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,300,0,0" rel="stylesheet">
   <style>
-    body { font-family: Arial, Helvetica, sans-serif; margin: 20px; }
-    textarea, input { width: 100%; box-sizing: border-box; font-size: 16px; padding: 8px; margin: 8px 0; }
-    button { padding: 8px 12px; margin: 4px; font-size: 16px; cursor: pointer; }
-    button.active { opacity: 0.5; }
-    .hide { display: none; }
-    #prompt { font-size: 24px; font-weight: bold; margin: 16px 0 0; }
-    #playAudio { font-size: 24px; background: none; border: none; cursor: pointer; vertical-align: middle; }
-    #resultArea { margin-top: 16px; font-size: 18px; }
-    #quizArea { margin-top: 20px; }
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0; padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+    html, body {
+      height: 100%; width: 100%;
+      overflow: hidden;
+      font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+    }
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+      line-height: 1; display: block; user-select: none;
+    }
+
+    /* ─── SCREENS ─── */
+    .screen {
+      position: fixed; inset: 0;
+      display: none; flex-direction: column;
+    }
+    .screen.active { display: flex; }
+
+    /* ════════════════════════
+       HOME SCREEN
+    ════════════════════════ */
+    #screen-home { background: #EEEEEE; }
+
+    .home-inner {
+      flex: 1; min-height: 0;
+      display: flex; flex-direction: column;
+      padding: env(safe-area-inset-top, 44px) 16px 0;
+      overflow: hidden;
+    }
+
+    .home-title {
+      font-size: 34px; font-weight: 800;
+      text-align: center; color: #1A1A1A;
+      padding: 18px 0 22px; flex-shrink: 0;
+    }
+
+    .home-content {
+      flex: 1; min-height: 0;
+      display: flex; flex-direction: column; gap: 12px;
+      padding-bottom: 4px;
+    }
+
+    .cards-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 94px 94px;
+      gap: 12px; flex-shrink: 0;
+    }
+
+    .card {
+      background: #fff; border-radius: 24px;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 8px; cursor: pointer;
+      user-select: none; -webkit-user-select: none;
+      transition: transform .1s ease;
+    }
+    .card:active { transform: scale(0.96); }
+
+    .card-ninicode { grid-row: 1 / 3; }
+
+    .card-icon { font-size: 28px; color: #1A1A1A; }
+    .card-label { font-size: 14px; font-weight: 700; color: #1A1A1A; }
+
+    .card-start { flex: 1; min-height: 150px; }
+
+    .start-circle {
+      width: 84px; height: 84px; border-radius: 50%;
+      border: 3px solid #2C6878;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 16px;
+    }
+    .start-arrow {
+      font-size: 44px; color: #2C6878;
+      font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 48;
+    }
+    .start-label { font-size: 26px; font-weight: 700; color: #2C6878; }
+
+    /* Bottom nav */
+    .bottom-nav {
+      display: flex; align-items: center;
+      justify-content: space-between;
+      padding: 10px 24px;
+      padding-bottom: calc(10px + env(safe-area-inset-bottom, 16px));
+      flex-shrink: 0;
+    }
+    .nav-icon-btn {
+      background: none; border: none; padding: 8px;
+      cursor: pointer; color: #888; display: flex;
+    }
+    .nav-pill {
+      background: #fff; border-radius: 50px;
+      padding: 8px 18px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .nav-dots { font-size: 12px; color: #888; letter-spacing: 3px; }
+    .nav-x-circle {
+      width: 32px; height: 32px; background: #1A1A1A;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .nav-x-circle .material-symbols-outlined { font-size: 18px; color: #fff; }
+    .nav-dot-single { font-size: 12px; color: #888; }
+
+    /* ════════════════════════
+       SETTINGS OVERLAY
+    ════════════════════════ */
+    #settings-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.45);
+      display: none; align-items: flex-end;
+      z-index: 200;
+      backdrop-filter: blur(3px);
+      -webkit-backdrop-filter: blur(3px);
+    }
+    #settings-overlay.open { display: flex; }
+
+    .bottom-sheet {
+      background: #F3F3F3; border-radius: 28px 28px 0 0;
+      width: 100%;
+      padding: 0 20px calc(28px + env(safe-area-inset-bottom, 0px));
+      max-height: 92vh; overflow-y: auto;
+      transform: translateY(100%);
+      transition: transform .35s cubic-bezier(.32,.72,0,1);
+    }
+    .bottom-sheet.open { transform: translateY(0); }
+
+    .sheet-handle {
+      width: 36px; height: 4px; background: #ccc;
+      border-radius: 2px; margin: 10px auto 18px;
+    }
+    .sheet-title {
+      font-size: 18px; font-weight: 700;
+      text-align: center; color: #1A1A1A;
+      margin-bottom: 18px;
+    }
+
+    .tabs-row { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+
+    .tab-chip {
+      background: #fff; border: none; border-radius: 50px;
+      padding: 8px 14px; font-size: 13px;
+      font-family: inherit; cursor: pointer;
+      color: #1A1A1A; font-weight: 400;
+      transition: background .15s;
+    }
+    .tab-chip:first-child { color: #999; }
+    .tab-chip.sel { background: #DCDCDC; font-weight: 700; }
+
+    .summary-card {
+      background: #fff; border-radius: 16px;
+      padding: 16px 12px; text-align: center;
+      font-size: 16px; font-weight: 700; color: #2C6878;
+      margin-bottom: 12px;
+    }
+
+    .selector-card {
+      background: #fff; border-radius: 16px;
+      padding: 8px 4px; margin-bottom: 8px;
+      display: flex; justify-content: space-evenly; align-items: center;
+    }
+
+    /* Dot selector cells */
+    .dot-cell {
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 4px; padding: 10px 10px;
+      min-width: 48px; border-radius: 12px;
+      cursor: pointer; user-select: none;
+      transition: background .12s;
+    }
+    .dot-cell.sel { background: #2C6878; }
+    .dot-lbl { font-size: 10px; font-weight: 700; color: #fff; display: none; }
+    .dot-cell.sel .dot-lbl { display: block; }
+
+    /* Operation cells */
+    .op-cell {
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 4px; padding: 8px 10px;
+      min-width: 48px; border-radius: 12px;
+      cursor: pointer; user-select: none;
+      transition: background .12s;
+    }
+    .op-cell.sel { background: #2C6878; }
+
+    .op-circle {
+      width: 38px; height: 38px; border-radius: 50%;
+      border: 1.5px solid #ccc;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; font-weight: 700; color: #1A1A1A;
+      transition: border-color .12s, color .12s;
+    }
+    .op-cell.sel .op-circle { border-color: rgba(255,255,255,.7); color: #fff; }
+
+    .op-lbl { font-size: 10px; font-weight: 700; color: #fff; display: none; }
+    .op-cell.sel .op-lbl { display: block; }
+
+    .sheet-start-btn {
+      width: 100%; padding: 16px;
+      background: #2C6878; color: #fff;
+      border: none; border-radius: 16px;
+      font-size: 16px; font-weight: 700;
+      font-family: inherit; cursor: pointer;
+      margin-top: 20px;
+      transition: background .15s;
+    }
+    .sheet-start-btn:active { background: #1E4E5A; }
+
+    /* ════════════════════════
+       QUIZ SCREEN
+    ════════════════════════ */
+    #screen-quiz { background: #fff; }
+
+    .quiz-topbar {
+      display: flex; align-items: center;
+      justify-content: space-between;
+      padding: env(safe-area-inset-top, 44px) 8px 10px;
+      border-bottom: 1px solid #eee;
+      flex-shrink: 0;
+    }
+    .topbar-side { display: flex; align-items: center; }
+    .topbar-counter { font-size: 14px; color: #888; }
+    .icon-btn {
+      background: none; border: none; padding: 8px;
+      cursor: pointer; color: #1A1A1A;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .quiz-workspace {
+      flex: 1; min-height: 0;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: flex-end;
+      padding: 24px 24px 28px;
+      background: #fff;
+    }
+
+    .problem-display {
+      font-size: 50px; font-weight: 300;
+      color: #1A1A1A; letter-spacing: 2px;
+      text-align: center; margin-bottom: 24px;
+    }
+
+    .answer-row { display: flex; align-items: center; gap: 12px; }
+
+    .prev-btn {
+      background: none; border: none; cursor: pointer;
+      padding: 4px; display: flex; align-items: center; color: #888;
+    }
+
+    .answer-box {
+      width: 200px; height: 52px;
+      border: 1.5px solid #ccc; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 28px; font-weight: 300; color: #1A1A1A;
+      background: #fff; letter-spacing: 2px;
+      transition: border-color .2s, background .2s;
+    }
+    .answer-box.correct { border-color: #4CAF50; background: #F1F8F1; }
+    .answer-box.wrong   { border-color: #EF5350; background: #FFF5F5; }
+
+    .quiz-divider { height: 1px; background: #eee; flex-shrink: 0; }
+
+    /* Numpad */
+    .numpad {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+      flex-shrink: 0;
+    }
+    .numpad-key {
+      height: 68px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; font-weight: 400; color: #1A1A1A;
+      border: .5px solid #eee;
+      cursor: pointer; user-select: none; -webkit-user-select: none;
+      background: #fff; transition: background .08s;
+    }
+    .numpad-key:active { background: #F5F5F5; }
+    .numpad-key.empty  { background: #F6F6F6; cursor: default; }
+    .numpad-key.empty:active { background: #F6F6F6; }
+    .numpad-bottom { height: env(safe-area-inset-bottom, 0px); background: #fff; flex-shrink: 0; }
+
+    /* ════════════════════════
+       RESULT OVERLAY
+    ════════════════════════ */
+    #result-overlay {
+      position: fixed; inset: 0; background: #fff;
+      display: none; flex-direction: column;
+      align-items: center; justify-content: center;
+      z-index: 300;
+    }
+    #result-overlay.open { display: flex; }
+
+    .result-title { font-size: 24px; font-weight: 700; color: #1A1A1A; margin-bottom: 28px; }
+    .result-score { font-size: 68px; font-weight: 700; color: #2C6878; line-height: 1; }
+    .result-sub   { font-size: 16px; color: #888; margin-top: 10px; margin-bottom: 52px; }
+
+    .result-actions { display: flex; gap: 16px; }
+
+    .btn-outline {
+      padding: 14px 28px; background: transparent;
+      border: 1.5px solid #2C6878; border-radius: 14px;
+      color: #2C6878; font-size: 15px; font-weight: 600;
+      cursor: pointer; font-family: inherit;
+    }
+    .btn-outline:active { background: #EBF3F5; }
+
+    .btn-filled {
+      padding: 14px 28px; background: #2C6878; border: none;
+      border-radius: 14px; color: #fff;
+      font-size: 15px; font-weight: 600;
+      cursor: pointer; font-family: inherit;
+    }
+    .btn-filled:active { background: #1E4E5A; }
   </style>
 </head>
 <body>
 
-<div id="setupArea">
-  <h2>語彙を入力（単語↵日本語↵カタカナ↵語源解説↵英文↵訳文…↵↵で区切り）</h2>
-  <textarea id="vocabInput" rows="10" placeholder="Hello\nこんにちは\nハロー\n接頭辞: 無し / 接尾辞: o\nHello! How are you today?\nこんにちは！今日はどうですか？\nHello, my name is Tom.\nこんにちは、私の名前はトムです。\n\nApple\nりんご\nアップル\n接尾辞: -le（小さいもの）\nThis is an apple.\nこれはりんごです。\nI like eating apples.\n私はりんごを食べるのが好きです。"></textarea>
-  <div>
-    <button id="modeEnJa">英語から日本語</button>
-    <button id="modeJaEn">日本語から英語</button>
-    <button id="insertExample">📋 入力例を挿入</button>
-    <p style="color:gray;font-size:14px;">形式: 単語→日本語→カタカナ→語源→例文（英→日）を最低1セット以上入力してください。</p>
+  <!-- ══ HOME ══ -->
+  <div id="screen-home" class="screen active">
+    <div class="home-inner">
+      <h1 class="home-title">Ninimaths</h1>
+      <div class="home-content">
+        <div class="cards-grid">
+          <div class="card card-ninicode">
+            <span class="material-symbols-outlined card-icon">explore</span>
+            <span class="card-label">Ninicode</span>
+          </div>
+          <div class="card">
+            <span class="material-symbols-outlined card-icon">language</span>
+            <span class="card-label">Leaderboards</span>
+          </div>
+          <div class="card">
+            <span class="material-symbols-outlined card-icon">schedule</span>
+            <span class="card-label">Challenges</span>
+          </div>
+        </div>
+        <div class="card card-start" id="btn-open-settings">
+          <div class="start-circle">
+            <span class="material-symbols-outlined start-arrow">arrow_upward</span>
+          </div>
+          <span class="start-label">Start</span>
+        </div>
+      </div>
+    </div>
+    <nav class="bottom-nav">
+      <button class="nav-icon-btn">
+        <span class="material-symbols-outlined">bookmark</span>
+      </button>
+      <div class="nav-pill">
+        <span class="nav-dots">•••</span>
+        <div class="nav-x-circle">
+          <span class="material-symbols-outlined">close</span>
+        </div>
+        <span class="nav-dot-single">•</span>
+      </div>
+      <button class="nav-icon-btn">
+        <span class="material-symbols-outlined">menu</span>
+      </button>
+    </nav>
   </div>
-</div>
 
-<div id="quizArea" class="hide">
-  <p id="prompt"></p><button id="playAudio" title="もう一度聞く">🔊</button>
-  <input id="answerInput" placeholder="ここに回答を入力してEnter">
-  <div id="resultArea"></div>
-  <button id="skipBtn">打ち直しなし</button>
-  <button id="backBtn">入力欄に戻る</button>
-</div>
+  <!-- ══ QUIZ ══ -->
+  <div id="screen-quiz" class="screen">
+    <header class="quiz-topbar">
+      <div class="topbar-side">
+        <button class="icon-btn" id="btn-quiz-close">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+      <span class="topbar-counter" id="quiz-counter">1 / 100</span>
+      <div class="topbar-side">
+        <button class="icon-btn">
+          <span class="material-symbols-outlined">keyboard_double_arrow_up</span>
+        </button>
+        <button class="icon-btn">
+          <span class="material-symbols-outlined">fullscreen</span>
+        </button>
+      </div>
+    </header>
+    <div class="quiz-workspace">
+      <div class="problem-display" id="problem-display">329 × 4</div>
+      <div class="answer-row">
+        <button class="prev-btn" id="btn-prev">
+          <span class="material-symbols-outlined" style="font-size:30px">chevron_left</span>
+        </button>
+        <div class="answer-box" id="answer-box"></div>
+      </div>
+    </div>
+    <div class="quiz-divider"></div>
+    <div class="numpad" id="numpad"></div>
+    <div class="numpad-bottom"></div>
+  </div>
 
-<script>
-(()=>{'use strict';
-const vocabInput=document.getElementById('vocabInput');
-const modeEnJa=document.getElementById('modeEnJa');
-const modeJaEn=document.getElementById('modeJaEn');
-const quizArea=document.getElementById('quizArea');
-const promptEl=document.getElementById('prompt');
-const playAudio=document.getElementById('playAudio');
-const answerIn=document.getElementById('answerInput');
-const resultArea=document.getElementById('resultArea');
-const skipBtn=document.getElementById('skipBtn');
-const backBtn=document.getElementById('backBtn');
-const insertExample=document.getElementById('insertExample');
+  <!-- ══ SETTINGS SHEET ══ -->
+  <div id="settings-overlay">
+    <div class="bottom-sheet" id="settings-sheet">
+      <div class="sheet-handle"></div>
+      <h2 class="sheet-title">暗算の設定</h2>
+      <div class="tabs-row" id="tabs-row">
+        <button class="tab-chip" data-idx="0">EXモード</button>
+        <button class="tab-chip sel" data-idx="1">筆算表示</button>
+        <button class="tab-chip" data-idx="2">キーパッド</button>
+        <button class="tab-chip" data-idx="3">その他</button>
+      </div>
+      <div class="summary-card" id="settings-summary"></div>
+      <div class="selector-card" id="sel-count"></div>
+      <div class="selector-card" id="sel-first"></div>
+      <div class="selector-card" id="sel-second"></div>
+      <div class="selector-card" id="sel-ops"></div>
+      <button class="sheet-start-btn" id="btn-begin">始める</button>
+    </div>
+  </div>
 
-insertExample.addEventListener('click', () => {
-  vocabInput.value = `Hello\nこんにちは\nハロー\n接頭辞: なし / 接尾辞: o（感動表現）\nHello! How are you today?\nこんにちは！今日はどうですか？\nHello, my name is Tom.\nこんにちは、私の名前はトムです。\n\nApple\nりんご\nアップル\n接頭辞: なし / 接尾辞: -le（小さいものを表す）\nThis is an apple.\nこれはりんごです。\nI like eating apples.\n私はりんごを食べるのが好きです。`;
-});
+  <!-- ══ RESULT ══ -->
+  <div id="result-overlay">
+    <div class="result-title">結果</div>
+    <div class="result-score" id="result-score">0 / 0</div>
+    <div class="result-sub">正解</div>
+    <div class="result-actions">
+      <button class="btn-outline" id="btn-go-home">ホーム</button>
+      <button class="btn-filled"  id="btn-retry">もう一度</button>
+    </div>
+  </div>
 
-let wordList=[],current=0,mode='en-ja',active=false;
-let skipAlways=false;
-let waitingForNext=false;
-let currentItem=null;
-let mustRetry=false;
+  <script>
+  'use strict';
 
-let defaultVoice=null;
-function setDefaultVoice(){
-  const voices=speechSynthesis.getVoices();
-  if(!voices.length||defaultVoice) return;
-  defaultVoice=voices.find(v=>/^en[-_]/i.test(v.lang)&&/female/i.test(v.name))||
-                voices.find(v=>/^en[-_]/i.test(v.lang))||voices[0];
-}
-setDefaultVoice();
-speechSynthesis.onvoiceschanged=setDefaultVoice;
+  /* ── State ── */
+  const app = {
+    settings: { firstDigits: 3, secondDigits: 1, operation: 'multiply', questionCount: 100 },
+    quiz:     { problems: [], index: 0, input: '', correct: 0, state: 'idle' },
+    timer:    null
+  };
 
-function speak(text){
-  if(!text) return;
-  if(speechSynthesis.speaking) speechSynthesis.cancel();
-  const u=new SpeechSynthesisUtterance(text);
-  u.lang='en-US';
-  if(defaultVoice) u.voice=defaultVoice;
-  speechSynthesis.speak(u);
-}
+  const Q_COUNTS  = [10, 25, 50, 75, 100];
+  const DIGITS    = [1, 2, 3, 4, 5];
+  const OPS = [
+    { id:'add',      sym:'+', label:'足し算' },
+    { id:'subtract', sym:'−', label:'引き算' },
+    { id:'multiply', sym:'×', label:'掛け算' },
+    { id:'divide',   sym:'÷', label:'割り算' },
+    { id:'mix',      sym:'◎', label:'ミックス' }
+  ];
 
-modeEnJa.addEventListener('click',()=>startQuiz('en-ja'));
-modeJaEn.addEventListener('click',()=>startQuiz('ja-en'));
-playAudio.addEventListener('click',()=>{ if(currentItem) speak(currentItem.en); });
+  /* ── DOM ── */
+  const $home    = document.getElementById('screen-home');
+  const $quiz    = document.getElementById('screen-quiz');
+  const $overlay = document.getElementById('settings-overlay');
+  const $sheet   = document.getElementById('settings-sheet');
+  const $result  = document.getElementById('result-overlay');
 
-skipBtn.addEventListener('click',()=>{
-  skipAlways = !skipAlways;
-  skipBtn.classList.toggle('active');
-});
+  /* ── Navigation ── */
+  function showHome() {
+    $quiz.classList.remove('active');
+    $home.classList.add('active');
+    $result.classList.remove('open');
+  }
+  function showQuiz() {
+    $home.classList.remove('active');
+    $quiz.classList.add('active');
+  }
+  function openSettings() {
+    $overlay.classList.add('open');
+    requestAnimationFrame(() => $sheet.classList.add('open'));
+    renderSettings();
+  }
+  function closeSettings() {
+    $sheet.classList.remove('open');
+    setTimeout(() => $overlay.classList.remove('open'), 350);
+  }
 
-backBtn.addEventListener('click', () => {
-  active = false;
-  quizArea.classList.add('hide');
-  document.getElementById('setupArea').classList.remove('hide');
-  vocabInput.focus();
-});
+  /* ── Settings rendering ── */
+  function dotSVG(idx, color) {
+    const r = 2.8;
+    const p = [
+      [[12,12]],
+      [[7,12],[17,12]],
+      [[4,12],[12,12],[20,12]],
+      [[7,7],[17,7],[7,17],[17,17]],
+      [[5.5,5.5],[18.5,5.5],[12,12],[5.5,18.5],[18.5,18.5]]
+    ];
+    const circles = p[Math.min(idx,4)]
+      .map(([x,y]) => `<circle cx="${x}" cy="${y}" r="${r}" fill="${color}"/>`)
+      .join('');
+    return `<svg width="24" height="24" viewBox="0 0 24 24">${circles}</svg>`;
+  }
 
-answerIn.addEventListener('keydown',e=>{
-  if(e.key==='Enter'){
-    e.preventDefault();
-    const ans = answerIn.value.trim();
-    const correct = mode==='en-ja' ? ans === currentItem.ja : ans.toLowerCase() === currentItem.en.toLowerCase();
-
-    if(waitingForNext){
-      if(skipAlways || !mustRetry || correct){
-        mustRetry = false;
-        nextQuestion();
-      }else{
-        speak(currentItem.en);
-        const wrongAnsLine = `<div style=\"color:gray;\">あなたの回答: ${ans}</div>`;
-        const match = resultArea.innerHTML.match(/<br><strong>(.*?)<\/strong>/);
-        if (match) {
-          resultArea.innerHTML = resultArea.innerHTML.replace(/<div style=\"color:gray;\">あなたの回答: .*?<\/div>/, '');
-          resultArea.innerHTML = resultArea.innerHTML.replace(/<div style=\"color:red;\">.*?<\/div>/, `<div style=\"color:red\">❌ もう一度正しく入力してからEnterを押してください。</div>`);
-          resultArea.innerHTML = resultArea.innerHTML.replace(match[0], `<br><strong>${match[1]}</strong>${wrongAnsLine}`);
-        }
-        answerIn.value = '';
-        setTimeout(()=>answerIn.focus(), 0);
+  function renderSelectorRow(id, options, selected, suffix, onChange) {
+    const el = document.getElementById(id);
+    el.innerHTML = '';
+    options.forEach((val, i) => {
+      const isSel = val === selected;
+      const cell = document.createElement('div');
+      cell.className = 'dot-cell' + (isSel ? ' sel' : '');
+      cell.innerHTML = dotSVG(i, isSel ? '#fff' : '#999');
+      if (isSel) {
+        const lbl = document.createElement('div');
+        lbl.className = 'dot-lbl';
+        lbl.textContent = val + suffix;
+        cell.appendChild(lbl);
       }
-    }else{
-      showResult(correct, ans);
+      cell.addEventListener('click', () => { onChange(val); renderSettings(); });
+      el.appendChild(cell);
+    });
+  }
+
+  function renderOps() {
+    const el = document.getElementById('sel-ops');
+    el.innerHTML = '';
+    OPS.forEach(op => {
+      const isSel = app.settings.operation === op.id;
+      const cell  = document.createElement('div');
+      cell.className = 'op-cell' + (isSel ? ' sel' : '');
+      cell.innerHTML =
+        `<div class="op-circle">${op.sym}</div>` +
+        (isSel ? `<div class="op-lbl">${op.label}</div>` : '');
+      cell.addEventListener('click', () => { app.settings.operation = op.id; renderSettings(); });
+      el.appendChild(cell);
+    });
+  }
+
+  function renderSettings() {
+    const s = app.settings;
+    const opLabel = OPS.find(o => o.id === s.operation)?.label ?? '';
+    document.getElementById('settings-summary').textContent =
+      `${s.firstDigits}桁 と ${s.secondDigits}桁 の ${opLabel} を ${s.questionCount}問`;
+    renderSelectorRow('sel-count',  Q_COUNTS, s.questionCount, '問', v => app.settings.questionCount = v);
+    renderSelectorRow('sel-first',  DIGITS,   s.firstDigits,   '桁', v => app.settings.firstDigits   = v);
+    renderSelectorRow('sel-second', DIGITS,   s.secondDigits,  '桁', v => app.settings.secondDigits  = v);
+    renderOps();
+  }
+
+  /* ── Problem generation ── */
+  const ri = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+
+  function makeProblem(s) {
+    const minA = Math.pow(10, s.firstDigits  - 1) | 0;
+    const maxA = Math.pow(10, s.firstDigits)  - 1 | 0;
+    const minB = Math.pow(10, s.secondDigits - 1) | 0;
+    const maxB = Math.pow(10, s.secondDigits) - 1 | 0;
+
+    let op = s.operation;
+    if (op === 'mix') op = ['add','subtract','multiply'][ri(0,2)];
+
+    switch (op) {
+      case 'add': {
+        const a = ri(minA,maxA), b = ri(minB,maxB);
+        return { a, b, sym:'+', ans: a+b };
+      }
+      case 'subtract': {
+        const a   = ri(minA,maxA);
+        const bMax = Math.min(maxB, a);
+        const b   = bMax >= minB ? ri(minB, bMax) : 0;
+        return { a, b, sym:'−', ans: a-b };
+      }
+      case 'multiply': {
+        const a = ri(minA,maxA), b = ri(minB,maxB);
+        return { a, b, sym:'×', ans: a*b };
+      }
+      case 'divide': {
+        const b    = ri(minB,maxB);
+        const qMin = Math.max(1, (minA/b)|0);
+        const qMax = (maxA/b)|0;
+        const q    = qMin <= qMax ? ri(qMin,qMax) : 1;
+        return { a: q*b, b, sym:'÷', ans: q };
+      }
+      default: {
+        const a = ri(minA,maxA), b = ri(minB,maxB);
+        return { a, b, sym:'×', ans: a*b };
+      }
     }
   }
-});
 
-answerIn.addEventListener('click', () => { setTimeout(() => answerIn.focus(), 0); });
+  /* ── Quiz ── */
+  function buildNumpad() {
+    const pad = document.getElementById('numpad');
+    pad.innerHTML = '';
+    [[null,'1','2','3'],[null,'4','5','6'],[null,'7','8','9'],[null,'C','0','BS']]
+      .forEach(row => {
+        row.forEach(k => {
+          const cell = document.createElement('div');
+          cell.className = 'numpad-key' + (k === null ? ' empty' : '');
+          if (k !== null) {
+            cell.textContent = k;
+            cell.addEventListener('click', () => handleKey(k));
+          }
+          pad.appendChild(cell);
+        });
+      });
+  }
 
-function startQuiz(m){
-  mode=m;
-  if(!parseInput()){ alert('単語が登録されていません'); return; }
-  current=0;
-  document.getElementById('setupArea').classList.add('hide');
-  quizArea.classList.remove('hide');
-  active=true;
-  nextQuestion();
-}
+  function startQuiz() {
+    closeSettings();
+    const q = app.quiz;
+    q.problems = Array.from({ length: app.settings.questionCount }, () => makeProblem(app.settings));
+    q.index = 0; q.input = ''; q.correct = 0; q.state = 'idle';
+    if (app.timer) clearTimeout(app.timer);
+    showQuiz();
+    buildNumpad();
+    renderQuiz();
+  }
 
-function parseInput(){
-  wordList=[];
-  vocabInput.value.trim().split(/\r?\n\s*\r?\n/).forEach(block=>{
-    const lines=block.split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
-    if(lines.length>=4){
-      const en=lines[0];
-      const ja=lines[1];
-      const kana=lines[2] || '';
-      const affix=lines[3] || '';
-      const examples=[];
-      for(let i=4;i<lines.length-1;i+=2){
-        examples.push({en:lines[i], ja:lines[i+1]});
+  function renderQuiz() {
+    const q = app.quiz;
+    const p = q.problems[q.index];
+    document.getElementById('quiz-counter').textContent =
+      `${q.index + 1} / ${app.settings.questionCount}`;
+    document.getElementById('problem-display').textContent =
+      `${p.a} ${p.sym} ${p.b}`;
+    const box = document.getElementById('answer-box');
+    box.textContent  = q.input;
+    box.className    = 'answer-box' + (q.state !== 'idle' ? ' ' + q.state : '');
+  }
+
+  function handleKey(k) {
+    const q = app.quiz;
+    if (q.state !== 'idle') return;
+
+    if (k === 'C') {
+      q.input = '';
+    } else if (k === 'BS') {
+      q.input = q.input.slice(0, -1);
+    } else {
+      if (q.input.length >= 7) return;
+      q.input += k;
+      const entered = parseInt(q.input, 10);
+      const p = q.problems[q.index];
+
+      if (entered === p.ans) {
+        q.state = 'correct';
+        q.correct++;
+        renderQuiz();
+        app.timer = setTimeout(nextQuestion, 600);
+        return;
       }
-      wordList.push({en,ja,kana,affix,examples});
+      // Flash wrong if input exceeds answer length
+      if (q.input.length >= String(p.ans).length) {
+        q.state = 'wrong';
+        renderQuiz();
+        setTimeout(() => { q.state = 'idle'; renderQuiz(); }, 400);
+        return;
+      }
+    }
+    renderQuiz();
+  }
+
+  function nextQuestion() {
+    const q = app.quiz;
+    q.state = 'idle'; q.input = '';
+    if (q.index + 1 >= app.settings.questionCount) {
+      document.getElementById('result-score').textContent =
+        `${q.correct} / ${app.settings.questionCount}`;
+      $result.classList.add('open');
+    } else {
+      q.index++;
+      renderQuiz();
+    }
+  }
+
+  /* ── Events ── */
+  document.getElementById('btn-open-settings').addEventListener('click', openSettings);
+  document.getElementById('btn-begin').addEventListener('click', startQuiz);
+
+  document.getElementById('btn-quiz-close').addEventListener('click', () => {
+    if (app.timer) clearTimeout(app.timer);
+    showHome();
+  });
+  document.getElementById('btn-prev').addEventListener('click', () => {
+    const q = app.quiz;
+    if (q.index > 0) {
+      if (app.timer) clearTimeout(app.timer);
+      q.index--; q.input = ''; q.state = 'idle';
+      renderQuiz();
     }
   });
-  return wordList.length>0;
-}
+  document.getElementById('btn-go-home').addEventListener('click', showHome);
+  document.getElementById('btn-retry').addEventListener('click', startQuiz);
 
-function nextQuestion(){
-  if(current>=wordList.length) return endQuiz();
-  resultArea.innerHTML='';
-  answerIn.value='';
-  waitingForNext = false;
-  mustRetry = false;
-  setTimeout(()=>answerIn.focus(), 0);
-  currentItem = wordList[current];
-  promptEl.textContent=mode==='en-ja'?currentItem.en:currentItem.ja;
-}
+  $overlay.addEventListener('click', e => { if (e.target === $overlay) closeSettings(); });
 
-function showResult(correct, userInput){
-  speak(currentItem.en);
-  const text = mode==='en-ja'?currentItem.ja:currentItem.en;
-  const ex = currentItem.examples.length ?
-    '<ul style="margin:8px 0 0 20px;padding:0;">' +
-    currentItem.examples.map(t => `<li>${t.en}<br><small style="color:gray;">${t.ja}</small></li>`).join('') +
-    '</ul>' : '<div>(例文なし)</div>';
-  const kanaLine = currentItem.kana ? `<div>🔤 カタカナ: ${currentItem.kana}</div>` : '';
-  const affixLine = currentItem.affix ? `<div>📚 語源: ${currentItem.affix}</div>` : '';
-  const wrongAns = !correct ? `<div style="color:gray;">あなたの回答: ${userInput}</div>` : '';
+  document.getElementById('tabs-row').addEventListener('click', e => {
+    const chip = e.target.closest('.tab-chip');
+    if (!chip) return;
+    document.querySelectorAll('.tab-chip').forEach(c => c.classList.remove('sel'));
+    chip.classList.add('sel');
+  });
 
-  resultArea.innerHTML = `
-    ${correct ? '✅ 正解！' : '❌ 不正解'}
-    <br><strong>${text}</strong>
-    ${wrongAns}
-    ${kanaLine}
-    ${affixLine}
-    ${ex}
-    <br><em>${correct || skipAlways ? 'Enterで次へ' : '正しい単語を再入力してEnterで次へ'}</em>
-  `;
-  waitingForNext = true;
-  mustRetry = !correct && !skipAlways;
-  if (correct || skipAlways) current++;
-  answerIn.value = '';
-  setTimeout(()=>answerIn.focus(), 0);
-}
-
-function endQuiz(){
-  active=false;
-  promptEl.textContent='';
-  resultArea.textContent='';
-  quizArea.classList.add('hide');
-  document.getElementById('setupArea').classList.remove('hide');
-  vocabInput.focus();
-  alert('すべての単語を出題し終えました！');
-}
-})();
-</script>
+  /* ── PWA ── */
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () =>
+      navigator.serviceWorker.register('sw.js').catch(() => {})
+    );
+  }
+  </script>
 </body>
 </html>
