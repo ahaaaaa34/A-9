@@ -640,12 +640,11 @@
       `${p.a} ${p.sym} ${p.b}`;
     const box = document.getElementById('answer-box');
     box.textContent  = q.input;
-    box.className    = 'answer-box' + (q.state !== 'idle' ? ' ' + q.state : '');
+    box.className    = 'answer-box';
   }
 
   function handleKey(k) {
     const q = app.quiz;
-    if (q.state !== 'idle') return;
 
     if (k === 'C') {
       q.input = '';
@@ -658,17 +657,8 @@
       const p = q.problems[q.index];
 
       if (entered === p.ans) {
-        q.state = 'correct';
         q.correct++;
-        renderQuiz();
-        app.timer = setTimeout(nextQuestion, 600);
-        return;
-      }
-      // Flash wrong if input exceeds answer length
-      if (q.input.length >= String(p.ans).length) {
-        q.state = 'wrong';
-        renderQuiz();
-        setTimeout(() => { q.state = 'idle'; renderQuiz(); }, 400);
+        nextQuestion();
         return;
       }
     }
@@ -677,7 +667,7 @@
 
   function nextQuestion() {
     const q = app.quiz;
-    q.state = 'idle'; q.input = '';
+    q.input = '';
     if (q.index + 1 >= app.settings.questionCount) {
       document.getElementById('result-score').textContent =
         `${q.correct} / ${app.settings.questionCount}`;
