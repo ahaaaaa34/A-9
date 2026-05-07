@@ -11,6 +11,7 @@ import androidx.navigation.compose.rememberNavController
 import com.ninimaths.app.data.QuizSettings
 import com.ninimaths.app.ui.home.HomeScreen
 import com.ninimaths.app.ui.quiz.QuizScreen
+import com.ninimaths.app.ui.records.RecordsScreen
 import com.ninimaths.app.ui.theme.NinimathsTheme
 
 class MainActivity : ComponentActivity() {
@@ -28,8 +29,12 @@ class MainActivity : ComponentActivity() {
                             onStartQuiz = { settings ->
                                 quizSettings = settings
                                 navController.navigate("quiz")
-                            }
+                            },
+                            onRecords = { navController.navigate("records") }
                         )
+                    }
+                    composable("records") {
+                        RecordsScreen(onHome = { navController.popBackStack() })
                     }
                     composable("quiz") {
                         QuizScreen(

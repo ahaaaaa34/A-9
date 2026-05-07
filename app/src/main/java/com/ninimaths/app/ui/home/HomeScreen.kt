@@ -9,9 +9,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ArrowUpward
 import androidx.compose.material.icons.outlined.Bookmark
-import androidx.compose.material.icons.outlined.Close
-import androidx.compose.material.icons.outlined.Explore
-import androidx.compose.material.icons.outlined.Language
 import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material.icons.outlined.Schedule
 import androidx.compose.material3.*
@@ -20,7 +17,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -31,7 +27,10 @@ import com.ninimaths.app.ui.theme.TealPrimary
 import com.ninimaths.app.ui.theme.TextGray
 
 @Composable
-fun HomeScreen(onStartQuiz: (QuizSettings) -> Unit) {
+fun HomeScreen(
+    onStartQuiz: (QuizSettings) -> Unit,
+    onRecords: () -> Unit
+) {
     var showSettings by remember { mutableStateOf(false) }
     var quizSettings by remember { mutableStateOf(QuizSettings()) }
 
@@ -51,7 +50,7 @@ fun HomeScreen(onStartQuiz: (QuizSettings) -> Unit) {
             Spacer(modifier = Modifier.height(32.dp))
 
             Text(
-                text = "Ninimaths",
+                text = "Mathix",
                 fontSize = 34.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color(0xFF1A1A1A)
@@ -59,53 +58,45 @@ fun HomeScreen(onStartQuiz: (QuizSettings) -> Unit) {
 
             Spacer(modifier = Modifier.height(28.dp))
 
-            Row(
+            // Records card
+            Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(200.dp),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    .height(110.dp)
+                    .clickable { onRecords() },
+                shape = RoundedCornerShape(24.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.White),
+                elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
             ) {
-                MenuCard(
-                    icon = Icons.Outlined.Explore,
-                    label = "Ninicode",
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxHeight(),
-                    onClick = {}
-                )
-
                 Column(
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxHeight(),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
                 ) {
-                    MenuCard(
-                        icon = Icons.Outlined.Language,
-                        label = "Leaderboards",
-                        modifier = Modifier
-                            .weight(1f)
-                            .fillMaxWidth(),
-                        onClick = {}
+                    Icon(
+                        imageVector = Icons.Outlined.Schedule,
+                        contentDescription = "記録",
+                        modifier = Modifier.size(28.dp),
+                        tint = Color(0xFF1A1A1A)
                     )
-                    MenuCard(
-                        icon = Icons.Outlined.Schedule,
-                        label = "Challenges",
-                        modifier = Modifier
-                            .weight(1f)
-                            .fillMaxWidth(),
-                        onClick = {}
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = "記録",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 14.sp,
+                        color = Color(0xFF1A1A1A)
                     )
                 }
             }
 
             Spacer(modifier = Modifier.height(12.dp))
 
+            // Start card
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f)
-                    .clickable { showSettings = true },
+                    .clickable { onStartQuiz(quizSettings) },
                 shape = RoundedCornerShape(24.dp),
                 colors = CardDefaults.cardColors(containerColor = Color.White),
                 elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
@@ -141,6 +132,7 @@ fun HomeScreen(onStartQuiz: (QuizSettings) -> Unit) {
             }
         }
 
+        // Bottom nav
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -149,18 +141,20 @@ fun HomeScreen(onStartQuiz: (QuizSettings) -> Unit) {
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            IconButton(onClick = {}) {
+            IconButton(onClick = { onRecords() }) {
                 Icon(
                     imageVector = Icons.Outlined.Bookmark,
-                    contentDescription = "Bookmarks",
+                    contentDescription = "Records",
                     tint = TextGray
                 )
             }
 
+            // Nav pill — dynamic, opens settings
             Box(
                 modifier = Modifier
                     .clip(RoundedCornerShape(50))
                     .background(Color.White)
+                    .clickable { showSettings = true }
                     .padding(horizontal = 20.dp, vertical = 10.dp),
                 contentAlignment = Alignment.Center
             ) {
@@ -168,21 +162,31 @@ fun HomeScreen(onStartQuiz: (QuizSettings) -> Unit) {
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    Text("•••", color = TextGray, fontSize = 14.sp, letterSpacing = 2.sp)
+                    Text(
+                        "•".repeat(quizSettings.firstDigits),
+                        color = TextGray,
+                        fontSize = 14.sp,
+                        letterSpacing = 2.sp
+                    )
                     Box(
                         modifier = Modifier
                             .size(32.dp)
                             .background(Color(0xFF1A1A1A), CircleShape),
                         contentAlignment = Alignment.Center
                     ) {
-                        Icon(
-                            imageVector = Icons.Outlined.Close,
-                            contentDescription = "Cancel",
-                            tint = Color.White,
-                            modifier = Modifier.size(18.dp)
+                        Text(
+                            text = quizSettings.operation.symbol,
+                            color = Color.White,
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Bold
                         )
                     }
-                    Text("•", color = TextGray, fontSize = 14.sp)
+                    Text(
+                        "•".repeat(quizSettings.secondDigits),
+                        color = TextGray,
+                        fontSize = 14.sp,
+                        letterSpacing = 2.sp
+                    )
                 }
             }
 
@@ -206,40 +210,5 @@ fun HomeScreen(onStartQuiz: (QuizSettings) -> Unit) {
                 onStartQuiz(quizSettings)
             }
         )
-    }
-}
-
-@Composable
-private fun MenuCard(
-    icon: ImageVector,
-    label: String,
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit
-) {
-    Card(
-        modifier = modifier.clickable(onClick = onClick),
-        shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
-    ) {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = label,
-                modifier = Modifier.size(28.dp),
-                tint = Color(0xFF1A1A1A)
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = label,
-                fontWeight = FontWeight.Bold,
-                fontSize = 14.sp,
-                color = Color(0xFF1A1A1A)
-            )
-        }
     }
 }

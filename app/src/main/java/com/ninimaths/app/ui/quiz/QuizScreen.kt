@@ -16,27 +16,29 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ninimaths.app.data.QuizSettings
 import com.ninimaths.app.data.generateProblems
+import com.ninimaths.app.data.recordResult
 import com.ninimaths.app.ui.theme.TealPrimary
-import kotlinx.coroutines.delay
 
 @Composable
 fun QuizScreen(
     settings: QuizSettings,
     onClose: () -> Unit
 ) {
+    val context = LocalContext.current
     var retryKey by remember { mutableIntStateOf(0) }
     val problems = remember(retryKey) { generateProblems(settings) }
     var currentIndex by remember(retryKey) { mutableIntStateOf(0) }
     var inputText by remember(retryKey) { mutableStateOf("") }
-    var answerState by remember(retryKey) { mutableStateOf<AnswerState>(AnswerState.Idle) }
     var correctCount by remember(retryKey) { mutableIntStateOf(0) }
     var showResult by remember { mutableStateOf(false) }
+    val startTime = remember(retryKey) { System.currentTimeMillis() }
 
     if (showResult) {
         ResultScreen(
@@ -53,51 +55,26 @@ fun QuizScreen(
 
     val currentProblem = problems.getOrNull(currentIndex)
 
-    LaunchedEffect(answerState) {
-        if (answerState is AnswerState.Correct) {
-            delay(600)
-            if (currentIndex + 1 >= settings.questionCount) {
-                showResult = true
-            } else {
-                currentIndex++
-                inputText = ""
-                answerState = AnswerState.Idle
-            }
-        } else if (answerState is AnswerState.Wrong) {
-            delay(400)
-            answerState = AnswerState.Idle
-        }
-    }
-
     fun onKeyPress(key: String) {
-        if (answerState != AnswerState.Idle) return
         when (key) {
             "C" -> inputText = ""
             "BS" -> if (inputText.isNotEmpty()) inputText = inputText.dropLast(1)
             else -> {
-                if (inputText.length < 7) {
-                    inputText += key
-                }
-                val enteredNum = inputText.toIntOrNull()
-                if (enteredNum != null && currentProblem != null) {
-                    if (enteredNum == currentProblem.answer) {
-                        answerState = AnswerState.Correct
-                        correctCount++
+                if (inputText.length >= 7) return
+                inputText += key
+                val entered = inputText.toIntOrNull()
+                if (entered != null && currentProblem != null && entered == currentProblem.answer) {
+                    correctCount++
+                    inputText = ""
+                    if (currentIndex + 1 >= settings.questionCount) {
+                        recordResult(context, settings, correctCount, System.currentTimeMillis() - startTime)
+                        showResult = true
+                    } else {
+                        currentIndex++
                     }
                 }
             }
         }
-    }
-
-    val inputBorderColor = when (answerState) {
-        is AnswerState.Correct -> Color(0xFF4CAF50)
-        is AnswerState.Wrong -> Color(0xFFF44336)
-        else -> Color(0xFFCCCCCC)
-    }
-    val inputBgColor = when (answerState) {
-        is AnswerState.Correct -> Color(0xFFE8F5E9)
-        is AnswerState.Wrong -> Color(0xFFFFEBEE)
-        else -> Color.White
     }
 
     Column(
@@ -114,11 +91,7 @@ fun QuizScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             IconButton(onClick = onClose) {
-                Icon(
-                    imageVector = Icons.Outlined.Close,
-                    contentDescription = "Close",
-                    tint = Color(0xFF1A1A1A)
-                )
+                Icon(Icons.Outlined.Close, contentDescription = "Close", tint = Color(0xFF1A1A1A))
             }
             Text(
                 text = "${currentIndex + 1} / ${settings.questionCount}",
@@ -127,18 +100,10 @@ fun QuizScreen(
             )
             Row {
                 IconButton(onClick = {}) {
-                    Icon(
-                        imageVector = Icons.Outlined.KeyboardDoubleArrowUp,
-                        contentDescription = "Scroll up",
-                        tint = Color(0xFF1A1A1A)
-                    )
+                    Icon(Icons.Outlined.KeyboardDoubleArrowUp, contentDescription = "Scroll up", tint = Color(0xFF1A1A1A))
                 }
                 IconButton(onClick = {}) {
-                    Icon(
-                        imageVector = Icons.Outlined.Fullscreen,
-                        contentDescription = "Expand",
-                        tint = Color(0xFF1A1A1A)
-                    )
+                    Icon(Icons.Outlined.Fullscreen, contentDescription = "Expand", tint = Color(0xFF1A1A1A))
                 }
             }
         }
@@ -178,7 +143,6 @@ fun QuizScreen(
                                 if (currentIndex > 0) {
                                     currentIndex--
                                     inputText = ""
-                                    answerState = AnswerState.Idle
                                 }
                             }
                         ) {
@@ -195,8 +159,8 @@ fun QuizScreen(
                                 .width(200.dp)
                                 .height(52.dp)
                                 .clip(RoundedCornerShape(8.dp))
-                                .background(inputBgColor)
-                                .border(1.5.dp, inputBorderColor, RoundedCornerShape(8.dp)),
+                                .background(Color.White)
+                                .border(1.5.dp, Color(0xFFCCCCCC), RoundedCornerShape(8.dp)),
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
@@ -225,9 +189,7 @@ fun QuizScreen(
                 listOf("C", "0", "BS")
             )
             keys.forEach { row ->
-                Row(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
+                Row(modifier = Modifier.fillMaxWidth()) {
                     Box(
                         modifier = Modifier
                             .weight(1f)
@@ -286,31 +248,14 @@ private fun ResultScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Text(
-            text = "結果",
-            fontSize = 28.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color(0xFF1A1A1A)
-        )
+        Text(text = "結果", fontSize = 28.sp, fontWeight = FontWeight.Bold, color = Color(0xFF1A1A1A))
         Spacer(modifier = Modifier.height(24.dp))
-        Text(
-            text = "$correct / $total",
-            fontSize = 56.sp,
-            fontWeight = FontWeight.Bold,
-            color = TealPrimary
-        )
+        Text(text = "$correct / $total", fontSize = 56.sp, fontWeight = FontWeight.Bold, color = TealPrimary)
         Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = "正解",
-            fontSize = 18.sp,
-            color = Color(0xFF888888)
-        )
+        Text(text = "正解", fontSize = 18.sp, color = Color(0xFF888888))
         Spacer(modifier = Modifier.height(48.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-            OutlinedButton(
-                onClick = onClose,
-                shape = RoundedCornerShape(12.dp)
-            ) {
+            OutlinedButton(onClick = onClose, shape = RoundedCornerShape(12.dp)) {
                 Text("ホーム", color = TealPrimary)
             }
             Button(
@@ -322,10 +267,4 @@ private fun ResultScreen(
             }
         }
     }
-}
-
-private sealed class AnswerState {
-    object Idle : AnswerState()
-    object Correct : AnswerState()
-    object Wrong : AnswerState()
 }

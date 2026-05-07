@@ -1,11 +1,11 @@
 package com.ninimaths.app.data
 
-enum class Operation(val symbol: String, val label: String) {
-    ADD("+", "足し算"),
-    SUBTRACT("-", "引き算"),
-    MULTIPLY("×", "掛け算"),
-    DIVIDE("÷", "割り算"),
-    MIX("◎", "ミックス")
+enum class Operation(val symbol: String, val label: String, val id: String) {
+    ADD("+", "足し算", "add"),
+    SUBTRACT("−", "引き算", "subtract"),
+    MULTIPLY("×", "掛け算", "multiply"),
+    DIVIDE("÷", "割り算", "divide"),
+    MIX("◎", "ミックス", "mix")
 }
 
 data class QuizSettings(
@@ -15,10 +15,7 @@ data class QuizSettings(
     val questionCount: Int = 100
 ) {
     val summaryText: String
-        get() {
-            val opLabel = operation.label
-            return "${firstDigits}桁 と ${secondDigits}桁 の $opLabel を ${questionCount}問"
-        }
+        get() = "${firstDigits}桁 と ${secondDigits}桁 の ${operation.label} を ${questionCount}問"
 }
 
 val QUESTION_COUNT_OPTIONS = listOf(10, 25, 50, 75, 100)
