@@ -4,40 +4,30 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="theme-color" content="#2C6878">
-  <title>Ninimaths</title>
+  <title>Mathix</title>
   <link rel="manifest" href="manifest.json">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="Ninimaths">
+  <meta name="apple-mobile-web-app-title" content="Mathix">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,300,0,0" rel="stylesheet">
   <style>
     *, *::before, *::after {
-      box-sizing: border-box;
-      margin: 0; padding: 0;
+      box-sizing: border-box; margin: 0; padding: 0;
       -webkit-tap-highlight-color: transparent;
       touch-action: manipulation;
     }
-    html, body {
-      height: 100%; width: 100%;
-      overflow: hidden;
-      font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
-    }
+    html, body { height: 100%; width: 100%; overflow: hidden;
+      font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif; }
     .material-symbols-outlined {
       font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
-      line-height: 1; display: block; user-select: none;
-    }
+      line-height: 1; display: block; user-select: none; }
 
     /* ─── SCREENS ─── */
-    .screen {
-      position: fixed; inset: 0;
-      display: none; flex-direction: column;
-    }
+    .screen { position: fixed; inset: 0; display: none; flex-direction: column; }
     .screen.active { display: flex; }
 
-    /* ════════════════════════
-       HOME SCREEN
-    ════════════════════════ */
+    /* ════════════════ HOME ════════════════ */
     #screen-home { background: #EEEEEE; }
 
     .home-inner {
@@ -46,24 +36,15 @@
       padding: env(safe-area-inset-top, 44px) 16px 0;
       overflow: hidden;
     }
-
     .home-title {
       font-size: 34px; font-weight: 800;
       text-align: center; color: #1A1A1A;
       padding: 18px 0 22px; flex-shrink: 0;
     }
-
     .home-content {
       flex: 1; min-height: 0;
       display: flex; flex-direction: column; gap: 12px;
       padding-bottom: 4px;
-    }
-
-    .cards-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      grid-template-rows: 94px 94px;
-      gap: 12px; flex-shrink: 0;
     }
 
     .card {
@@ -75,14 +56,14 @@
       transition: transform .1s ease;
     }
     .card:active { transform: scale(0.96); }
-
-    .card-ninicode { grid-row: 1 / 3; }
-
     .card-icon { font-size: 28px; color: #1A1A1A; }
     .card-label { font-size: 14px; font-weight: 700; color: #1A1A1A; }
 
-    .card-start { flex: 1; min-height: 150px; }
+    /* Records card (above Start) */
+    .card-records { height: 110px; flex-shrink: 0; }
 
+    /* Start card */
+    .card-start { flex: 1; min-height: 150px; }
     .start-circle {
       width: 84px; height: 84px; border-radius: 50%;
       border: 3px solid #2C6878;
@@ -95,10 +76,9 @@
     }
     .start-label { font-size: 26px; font-weight: 700; color: #2C6878; }
 
-    /* Bottom nav */
+    /* Bottom nav (home) */
     .bottom-nav {
-      display: flex; align-items: center;
-      justify-content: space-between;
+      display: flex; align-items: center; justify-content: space-between;
       padding: 10px 24px;
       padding-bottom: calc(10px + env(safe-area-inset-bottom, 16px));
       flex-shrink: 0;
@@ -107,6 +87,7 @@
       background: none; border: none; padding: 8px;
       cursor: pointer; color: #888; display: flex;
     }
+    .nav-icon-btn.active-nav { color: #2C6878; }
     .nav-pill {
       background: #fff; border-radius: 50px;
       padding: 8px 18px;
@@ -120,23 +101,79 @@
       width: 32px; height: 32px; background: #1A1A1A;
       border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
-      font-size: 16px; font-weight: 700; color: #fff;
-      flex-shrink: 0;
+      font-size: 16px; font-weight: 700; color: #fff; flex-shrink: 0;
     }
 
-    /* ════════════════════════
-       SETTINGS OVERLAY
-    ════════════════════════ */
+    /* ════════════════ RECORDS SCREEN ════════════════ */
+    #screen-records { background: #EEEEEE; }
+
+    .records-inner {
+      flex: 1; min-height: 0; overflow-y: auto;
+      padding: env(safe-area-inset-top, 44px) 16px 0;
+      display: flex; flex-direction: column;
+    }
+    .records-title {
+      font-size: 20px; font-weight: 800;
+      text-align: center; color: #1A1A1A;
+      padding: 18px 0 16px; flex-shrink: 0;
+    }
+    .records-card {
+      background: #fff; border-radius: 24px;
+      padding: 20px 20px 8px;
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+    .section-label {
+      font-size: 12px; color: #999;
+      margin: 4px 0 8px; padding-left: 4px;
+    }
+    .section-label:not(:first-child) { margin-top: 20px; }
+
+    .record-row {
+      display: flex; align-items: center;
+      gap: 14px; padding: 10px 4px;
+      border-bottom: 1px solid #F5F5F5;
+    }
+    .record-row:last-child { border-bottom: none; }
+
+    .rec-icon-wrap {
+      width: 28px; height: 28px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .rec-icon-wrap .material-symbols-outlined { font-size: 22px; color: #2C6878; }
+    .rec-op-circle {
+      width: 28px; height: 28px; border-radius: 50%;
+      border: 1.5px solid #2C6878;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 700; color: #2C6878;
+      flex-shrink: 0;
+    }
+    .rec-name { flex: 1; font-size: 15px; color: #1A1A1A; }
+    .rec-value { font-size: 16px; font-weight: 800; color: #1A1A1A; }
+
+    .daily-btn {
+      background: #fff; border-radius: 20px;
+      margin: 12px 0 8px;
+      padding: 18px; text-align: center;
+      font-size: 16px; font-weight: 700; color: #1A1A1A;
+      cursor: pointer; flex-shrink: 0;
+    }
+    .daily-btn:active { background: #F5F5F5; }
+
+    .rec-empty { font-size: 13px; color: #bbb; padding: 12px 4px; }
+
+    /* Bottom nav (records) */
+    .records-nav { background: #EEEEEE; }
+
+    /* ════════════════ SETTINGS OVERLAY ════════════════ */
     #settings-overlay {
       position: fixed; inset: 0;
       background: rgba(0,0,0,.45);
       display: none; align-items: flex-end;
       z-index: 200;
-      backdrop-filter: blur(3px);
-      -webkit-backdrop-filter: blur(3px);
+      backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
     }
     #settings-overlay.open { display: flex; }
-
     .bottom-sheet {
       background: #F3F3F3; border-radius: 28px 28px 0 0;
       width: 100%;
@@ -146,66 +183,51 @@
       transition: transform .35s cubic-bezier(.32,.72,0,1);
     }
     .bottom-sheet.open { transform: translateY(0); }
-
     .sheet-handle {
       width: 36px; height: 4px; background: #ccc;
       border-radius: 2px; margin: 10px auto 18px;
     }
     .sheet-title {
       font-size: 18px; font-weight: 700;
-      text-align: center; color: #1A1A1A;
-      margin-bottom: 18px;
+      text-align: center; color: #1A1A1A; margin-bottom: 18px;
     }
-
     .tabs-row { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
-
     .tab-chip {
       background: #fff; border: none; border-radius: 50px;
       padding: 8px 14px; font-size: 13px;
       font-family: inherit; cursor: pointer;
-      color: #1A1A1A; font-weight: 400;
-      transition: background .15s;
+      color: #1A1A1A; font-weight: 400; transition: background .15s;
     }
     .tab-chip:first-child { color: #999; }
     .tab-chip.sel { background: #DCDCDC; font-weight: 700; }
-
     .summary-card {
       background: #fff; border-radius: 16px;
       padding: 16px 12px; text-align: center;
-      font-size: 16px; font-weight: 700; color: #2C6878;
-      margin-bottom: 12px;
+      font-size: 16px; font-weight: 700; color: #2C6878; margin-bottom: 12px;
     }
-
     .selector-card {
       background: #fff; border-radius: 16px;
       padding: 8px 4px; margin-bottom: 8px;
       display: flex; justify-content: space-evenly; align-items: center;
     }
-
-    /* Dot selector cells */
     .dot-cell {
       display: flex; flex-direction: column;
       align-items: center; justify-content: center;
       gap: 4px; padding: 10px 10px;
       min-width: 48px; border-radius: 12px;
-      cursor: pointer; user-select: none;
-      transition: background .12s;
+      cursor: pointer; user-select: none; transition: background .12s;
     }
     .dot-cell.sel { background: #2C6878; }
     .dot-lbl { font-size: 10px; font-weight: 700; color: #fff; display: none; }
     .dot-cell.sel .dot-lbl { display: block; }
-
-    /* Operation cells */
     .op-cell {
       display: flex; flex-direction: column;
       align-items: center; justify-content: center;
       gap: 4px; padding: 8px 10px;
       min-width: 48px; border-radius: 12px;
-      cursor: pointer; user-select: none;
-      transition: background .12s;
+      cursor: pointer; user-select: none; transition: background .12s;
     }
     .op-cell.sel { background: #2C6878; }
-
     .op-circle {
       width: 38px; height: 38px; border-radius: 50%;
       border: 1.5px solid #ccc;
@@ -214,32 +236,22 @@
       transition: border-color .12s, color .12s;
     }
     .op-cell.sel .op-circle { border-color: rgba(255,255,255,.7); color: #fff; }
-
     .op-lbl { font-size: 10px; font-weight: 700; color: #fff; display: none; }
     .op-cell.sel .op-lbl { display: block; }
-
     .sheet-start-btn {
-      width: 100%; padding: 16px;
-      background: #2C6878; color: #fff;
+      width: 100%; padding: 16px; background: #2C6878; color: #fff;
       border: none; border-radius: 16px;
-      font-size: 16px; font-weight: 700;
-      font-family: inherit; cursor: pointer;
-      margin-top: 20px;
-      transition: background .15s;
+      font-size: 16px; font-weight: 700; font-family: inherit;
+      cursor: pointer; margin-top: 20px; transition: background .15s;
     }
     .sheet-start-btn:active { background: #1E4E5A; }
 
-    /* ════════════════════════
-       QUIZ SCREEN
-    ════════════════════════ */
+    /* ════════════════ QUIZ ════════════════ */
     #screen-quiz { background: #fff; }
-
     .quiz-topbar {
-      display: flex; align-items: center;
-      justify-content: space-between;
+      display: flex; align-items: center; justify-content: space-between;
       padding: env(safe-area-inset-top, 44px) 8px 10px;
-      border-bottom: 1px solid #eee;
-      flex-shrink: 0;
+      border-bottom: 1px solid #eee; flex-shrink: 0;
     }
     .topbar-side { display: flex; align-items: center; }
     .topbar-counter { font-size: 14px; color: #888; }
@@ -248,77 +260,54 @@
       cursor: pointer; color: #1A1A1A;
       display: flex; align-items: center; justify-content: center;
     }
-
     .quiz-workspace {
       flex: 1; min-height: 0;
       display: flex; flex-direction: column;
       align-items: center; justify-content: flex-end;
-      padding: 24px 24px 28px;
-      background: #fff;
+      padding: 24px 24px 28px; background: #fff;
     }
-
     .problem-display {
-      font-size: 50px; font-weight: 300;
-      color: #1A1A1A; letter-spacing: 2px;
-      text-align: center; margin-bottom: 24px;
+      font-size: 50px; font-weight: 300; color: #1A1A1A;
+      letter-spacing: 2px; text-align: center; margin-bottom: 24px;
     }
-
     .answer-row { display: flex; align-items: center; gap: 12px; }
-
     .prev-btn {
       background: none; border: none; cursor: pointer;
       padding: 4px; display: flex; align-items: center; color: #888;
     }
-
     .answer-box {
       width: 200px; height: 52px;
       border: 1.5px solid #ccc; border-radius: 8px;
       display: flex; align-items: center; justify-content: center;
       font-size: 28px; font-weight: 300; color: #1A1A1A;
       background: #fff; letter-spacing: 2px;
-      transition: border-color .2s, background .2s;
     }
-    .answer-box.correct { border-color: #4CAF50; background: #F1F8F1; }
-    .answer-box.wrong   { border-color: #EF5350; background: #FFF5F5; }
-
     .quiz-divider { height: 1px; background: #eee; flex-shrink: 0; }
-
-    /* Numpad */
-    .numpad {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr 1fr;
-      flex-shrink: 0;
-    }
+    .numpad { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; flex-shrink: 0; }
     .numpad-key {
       height: 68px;
       display: flex; align-items: center; justify-content: center;
       font-size: 22px; font-weight: 400; color: #1A1A1A;
-      border: .5px solid #eee;
-      cursor: pointer; user-select: none; -webkit-user-select: none;
+      border: .5px solid #eee; cursor: pointer;
+      user-select: none; -webkit-user-select: none;
       background: #fff; transition: background .08s;
     }
     .numpad-key:active { background: #F5F5F5; }
-    .numpad-key.empty  { background: #F6F6F6; cursor: default; }
+    .numpad-key.empty { background: #F6F6F6; cursor: default; }
     .numpad-key.empty:active { background: #F6F6F6; }
     .numpad-bottom { height: env(safe-area-inset-bottom, 0px); background: #fff; flex-shrink: 0; }
 
-    /* ════════════════════════
-       RESULT OVERLAY
-    ════════════════════════ */
+    /* ════════════════ RESULT ════════════════ */
     #result-overlay {
       position: fixed; inset: 0; background: #fff;
       display: none; flex-direction: column;
-      align-items: center; justify-content: center;
-      z-index: 300;
+      align-items: center; justify-content: center; z-index: 300;
     }
     #result-overlay.open { display: flex; }
-
     .result-title { font-size: 24px; font-weight: 700; color: #1A1A1A; margin-bottom: 28px; }
     .result-score { font-size: 68px; font-weight: 700; color: #2C6878; line-height: 1; }
-    .result-sub   { font-size: 16px; color: #888; margin-top: 10px; margin-bottom: 52px; }
-
+    .result-sub { font-size: 16px; color: #888; margin-top: 10px; margin-bottom: 52px; }
     .result-actions { display: flex; gap: 16px; }
-
     .btn-outline {
       padding: 14px 28px; background: transparent;
       border: 1.5px solid #2C6878; border-radius: 14px;
@@ -326,7 +315,6 @@
       cursor: pointer; font-family: inherit;
     }
     .btn-outline:active { background: #EBF3F5; }
-
     .btn-filled {
       padding: 14px 28px; background: #2C6878; border: none;
       border-radius: 14px; color: #fff;
@@ -341,23 +329,15 @@
   <!-- ══ HOME ══ -->
   <div id="screen-home" class="screen active">
     <div class="home-inner">
-      <h1 class="home-title">Ninimaths</h1>
+      <h1 class="home-title">Mathix</h1>
       <div class="home-content">
-        <div class="cards-grid">
-          <div class="card card-ninicode">
-            <span class="material-symbols-outlined card-icon">explore</span>
-            <span class="card-label">Ninicode</span>
-          </div>
-          <div class="card">
-            <span class="material-symbols-outlined card-icon">language</span>
-            <span class="card-label">Leaderboards</span>
-          </div>
-          <div class="card">
-            <span class="material-symbols-outlined card-icon">schedule</span>
-            <span class="card-label">Challenges</span>
-          </div>
+        <!-- Records card -->
+        <div class="card card-records" id="btn-records">
+          <span class="material-symbols-outlined card-icon">schedule</span>
+          <span class="card-label">記録</span>
         </div>
-        <div class="card card-start" id="btn-open-settings">
+        <!-- Start card -->
+        <div class="card card-start" id="btn-start">
           <div class="start-circle">
             <span class="material-symbols-outlined start-arrow">arrow_upward</span>
           </div>
@@ -366,7 +346,7 @@
       </div>
     </div>
     <nav class="bottom-nav">
-      <button class="nav-icon-btn">
+      <button class="nav-icon-btn" id="home-nav-bookmark" onclick="showScreen('records')">
         <span class="material-symbols-outlined">bookmark</span>
       </button>
       <div class="nav-pill" id="nav-pill" onclick="openSettings()">
@@ -374,6 +354,75 @@
         <div class="nav-op-circle" id="nav-op-circle">×</div>
         <span class="nav-dots" id="nav-dots-right">•</span>
       </div>
+      <button class="nav-icon-btn">
+        <span class="material-symbols-outlined">menu</span>
+      </button>
+    </nav>
+  </div>
+
+  <!-- ══ RECORDS ══ -->
+  <div id="screen-records" class="screen">
+    <div class="records-inner">
+      <h1 class="records-title">記録</h1>
+      <div class="records-card">
+
+        <div class="section-label">プレイデータ</div>
+        <div class="record-row">
+          <div class="rec-icon-wrap"><span class="material-symbols-outlined">check</span></div>
+          <span class="rec-name">解いた数</span>
+          <span class="rec-value" id="stat-solved">0</span>
+        </div>
+        <div class="record-row">
+          <div class="rec-icon-wrap"><span class="material-symbols-outlined">person</span></div>
+          <span class="rec-name">プレイヤーレベル</span>
+          <span class="rec-value" id="stat-level">1</span>
+        </div>
+        <div class="record-row">
+          <div class="rec-icon-wrap"><span class="material-symbols-outlined">favorite</span></div>
+          <span class="rec-name">ポイント</span>
+          <span class="rec-value" id="stat-points">0</span>
+        </div>
+
+        <div class="section-label">ハイスコア</div>
+        <div class="record-row">
+          <div class="rec-op-circle">+</div>
+          <span class="rec-name">足し算</span>
+          <span class="rec-value" id="hs-add">0</span>
+        </div>
+        <div class="record-row">
+          <div class="rec-op-circle">−</div>
+          <span class="rec-name">引き算</span>
+          <span class="rec-value" id="hs-subtract">0</span>
+        </div>
+        <div class="record-row">
+          <div class="rec-op-circle">×</div>
+          <span class="rec-name">掛け算</span>
+          <span class="rec-value" id="hs-multiply">0</span>
+        </div>
+        <div class="record-row">
+          <div class="rec-op-circle">÷</div>
+          <span class="rec-name">割り算</span>
+          <span class="rec-value" id="hs-divide">0</span>
+        </div>
+        <div class="record-row">
+          <div class="rec-op-circle">◎</div>
+          <span class="rec-name">ミックス</span>
+          <span class="rec-value" id="hs-mix">0</span>
+        </div>
+
+        <div class="section-label">ベストタイム（1問あたりの時間）</div>
+        <div id="best-times-list"></div>
+
+      </div>
+      <div class="daily-btn">日毎の記録</div>
+    </div>
+    <nav class="bottom-nav records-nav">
+      <button class="nav-icon-btn active-nav">
+        <span class="material-symbols-outlined">bookmark</span>
+      </button>
+      <button class="nav-icon-btn" onclick="showScreen('home')">
+        <span class="material-symbols-outlined">home</span>
+      </button>
       <button class="nav-icon-btn">
         <span class="material-symbols-outlined">menu</span>
       </button>
@@ -412,7 +461,7 @@
     <div class="numpad-bottom"></div>
   </div>
 
-  <!-- ══ SETTINGS SHEET ══ -->
+  <!-- ══ SETTINGS ══ -->
   <div id="settings-overlay">
     <div class="bottom-sheet" id="settings-sheet">
       <div class="sheet-handle"></div>
@@ -449,12 +498,12 @@
   /* ── State ── */
   const app = {
     settings: { firstDigits: 3, secondDigits: 1, operation: 'multiply', questionCount: 100 },
-    quiz:     { problems: [], index: 0, input: '', correct: 0, state: 'idle' },
+    quiz:     { problems: [], index: 0, input: '', correct: 0, startTime: 0 },
     timer:    null
   };
 
-  const Q_COUNTS  = [10, 25, 50, 75, 100];
-  const DIGITS    = [1, 2, 3, 4, 5];
+  const Q_COUNTS = [10, 25, 50, 75, 100];
+  const DIGITS   = [1, 2, 3, 4, 5];
   const OPS = [
     { id:'add',      sym:'+', label:'足し算' },
     { id:'subtract', sym:'−', label:'引き算' },
@@ -464,21 +513,17 @@
   ];
 
   /* ── DOM ── */
-  const $home    = document.getElementById('screen-home');
-  const $quiz    = document.getElementById('screen-quiz');
-  const $overlay = document.getElementById('settings-overlay');
-  const $sheet   = document.getElementById('settings-sheet');
-  const $result  = document.getElementById('result-overlay');
+  const $screens  = {};
+  ['home','records','quiz'].forEach(id => $screens[id] = document.getElementById('screen-' + id));
+  const $overlay  = document.getElementById('settings-overlay');
+  const $sheet    = document.getElementById('settings-sheet');
+  const $result   = document.getElementById('result-overlay');
 
   /* ── Navigation ── */
-  function showHome() {
-    $quiz.classList.remove('active');
-    $home.classList.add('active');
-    $result.classList.remove('open');
-  }
-  function showQuiz() {
-    $home.classList.remove('active');
-    $quiz.classList.add('active');
+  function showScreen(name) {
+    Object.values($screens).forEach(s => s.classList.remove('active'));
+    $screens[name].classList.add('active');
+    if (name === 'records') renderRecords();
   }
   function openSettings() {
     $overlay.classList.add('open');
@@ -490,7 +535,68 @@
     setTimeout(() => $overlay.classList.remove('open'), 350);
   }
 
-  /* ── Nav pill (reflects current settings) ── */
+  /* ── Stats (localStorage) ── */
+  const STATS_KEY = 'mathix-stats';
+  function defaultStats() {
+    return { totalSolved: 0, points: 0,
+      highScores: { add:0, subtract:0, multiply:0, divide:0, mix:0 },
+      bestTimes: {} };
+  }
+  function loadStats() {
+    try { const s = localStorage.getItem(STATS_KEY); return s ? JSON.parse(s) : defaultStats(); }
+    catch { return defaultStats(); }
+  }
+  function saveStats(s) {
+    try { localStorage.setItem(STATS_KEY, JSON.stringify(s)); } catch {}
+  }
+  function getLevel(n) { return Math.floor(n / 100) + 1; }
+
+  function recordResult(settings, correct, elapsedSec) {
+    const stats = loadStats();
+    stats.totalSolved += correct;
+    stats.points      += correct;
+    const opId = settings.operation;
+    if (correct > (stats.highScores[opId] || 0)) stats.highScores[opId] = correct;
+    if (correct > 0 && elapsedSec > 0) {
+      const tpq = elapsedSec / settings.questionCount;
+      const key = `${settings.firstDigits}_${settings.secondDigits}_${opId}`;
+      if (!stats.bestTimes[key] || tpq < stats.bestTimes[key]) stats.bestTimes[key] = tpq;
+    }
+    saveStats(stats);
+  }
+
+  /* ── Records rendering ── */
+  function renderRecords() {
+    const s = loadStats();
+    document.getElementById('stat-solved').textContent = s.totalSolved;
+    document.getElementById('stat-level').textContent  = getLevel(s.totalSolved);
+    document.getElementById('stat-points').textContent = s.points;
+    ['add','subtract','multiply','divide','mix'].forEach(id => {
+      const el = document.getElementById('hs-' + id);
+      if (el) el.textContent = s.highScores[id] || 0;
+    });
+    const btList = document.getElementById('best-times-list');
+    const entries = Object.entries(s.bestTimes);
+    if (entries.length === 0) {
+      btList.innerHTML = '<div class="rec-empty">まだ記録なし</div>';
+    } else {
+      btList.innerHTML = '';
+      entries.forEach(([key, secs]) => {
+        const [fd, sd, opId] = key.split('_');
+        const op = OPS.find(o => o.id === opId);
+        if (!op) return;
+        const row = document.createElement('div');
+        row.className = 'record-row';
+        row.innerHTML = `
+          <div class="rec-op-circle">${op.sym}</div>
+          <span class="rec-name">${fd}桁と${sd}桁の${op.label}</span>
+          <span class="rec-value">${secs.toFixed(2)}秒</span>`;
+        btList.appendChild(row);
+      });
+    }
+  }
+
+  /* ── Settings rendering ── */
   function updateNavPill() {
     const s = app.settings;
     const op = OPS.find(o => o.id === s.operation);
@@ -499,16 +605,11 @@
     document.getElementById('nav-dots-right').textContent = '•'.repeat(s.secondDigits);
   }
 
-  /* ── Settings rendering ── */
   function dotSVG(idx, color) {
     const r = 2.8;
-    const p = [
-      [[12,12]],
-      [[7,12],[17,12]],
-      [[4,12],[12,12],[20,12]],
-      [[7,7],[17,7],[7,17],[17,17]],
-      [[5.5,5.5],[18.5,5.5],[12,12],[5.5,18.5],[18.5,18.5]]
-    ];
+    const p = [[[12,12]],[[7,12],[17,12]],[[4,12],[12,12],[20,12]],
+               [[7,7],[17,7],[7,17],[17,17]],
+               [[5.5,5.5],[18.5,5.5],[12,12],[5.5,18.5],[18.5,18.5]]];
     const circles = p[Math.min(idx,4)]
       .map(([x,y]) => `<circle cx="${x}" cy="${y}" r="${r}" fill="${color}"/>`)
       .join('');
@@ -541,8 +642,7 @@
       const isSel = app.settings.operation === op.id;
       const cell  = document.createElement('div');
       cell.className = 'op-cell' + (isSel ? ' sel' : '');
-      cell.innerHTML =
-        `<div class="op-circle">${op.sym}</div>` +
+      cell.innerHTML = `<div class="op-circle">${op.sym}</div>` +
         (isSel ? `<div class="op-lbl">${op.label}</div>` : '');
       cell.addEventListener('click', () => { app.settings.operation = op.id; renderSettings(); });
       el.appendChild(cell);
@@ -569,36 +669,18 @@
     const maxA = Math.pow(10, s.firstDigits)  - 1 | 0;
     const minB = Math.pow(10, s.secondDigits - 1) | 0;
     const maxB = Math.pow(10, s.secondDigits) - 1 | 0;
-
     let op = s.operation;
     if (op === 'mix') op = ['add','subtract','multiply'][ri(0,2)];
-
     switch (op) {
-      case 'add': {
-        const a = ri(minA,maxA), b = ri(minB,maxB);
-        return { a, b, sym:'+', ans: a+b };
-      }
+      case 'add': { const a=ri(minA,maxA),b=ri(minB,maxB); return{a,b,sym:'+',ans:a+b}; }
       case 'subtract': {
-        const a   = ri(minA,maxA);
-        const bMax = Math.min(maxB, a);
-        const b   = bMax >= minB ? ri(minB, bMax) : 0;
-        return { a, b, sym:'−', ans: a-b };
-      }
-      case 'multiply': {
-        const a = ri(minA,maxA), b = ri(minB,maxB);
-        return { a, b, sym:'×', ans: a*b };
-      }
+        const a=ri(minA,maxA), bMax=Math.min(maxB,a);
+        const b=bMax>=minB?ri(minB,bMax):0; return{a,b,sym:'−',ans:a-b}; }
+      case 'multiply': { const a=ri(minA,maxA),b=ri(minB,maxB); return{a,b,sym:'×',ans:a*b}; }
       case 'divide': {
-        const b    = ri(minB,maxB);
-        const qMin = Math.max(1, (minA/b)|0);
-        const qMax = (maxA/b)|0;
-        const q    = qMin <= qMax ? ri(qMin,qMax) : 1;
-        return { a: q*b, b, sym:'÷', ans: q };
-      }
-      default: {
-        const a = ri(minA,maxA), b = ri(minB,maxB);
-        return { a, b, sym:'×', ans: a*b };
-      }
+        const b=ri(minB,maxB), qMin=Math.max(1,(minA/b)|0), qMax=(maxA/b)|0;
+        const q=qMin<=qMax?ri(qMin,qMax):1; return{a:q*b,b,sym:'÷',ans:q}; }
+      default: { const a=ri(minA,maxA),b=ri(minB,maxB); return{a,b,sym:'×',ans:a*b}; }
     }
   }
 
@@ -607,26 +689,21 @@
     const pad = document.getElementById('numpad');
     pad.innerHTML = '';
     [[null,'1','2','3'],[null,'4','5','6'],[null,'7','8','9'],[null,'C','0','BS']]
-      .forEach(row => {
-        row.forEach(k => {
-          const cell = document.createElement('div');
-          cell.className = 'numpad-key' + (k === null ? ' empty' : '');
-          if (k !== null) {
-            cell.textContent = k;
-            cell.addEventListener('click', () => handleKey(k));
-          }
-          pad.appendChild(cell);
-        });
-      });
+      .forEach(row => row.forEach(k => {
+        const cell = document.createElement('div');
+        cell.className = 'numpad-key' + (k===null?' empty':'');
+        if (k!==null) { cell.textContent=k; cell.addEventListener('click',()=>handleKey(k)); }
+        pad.appendChild(cell);
+      }));
   }
 
   function startQuiz() {
     closeSettings();
     const q = app.quiz;
-    q.problems = Array.from({ length: app.settings.questionCount }, () => makeProblem(app.settings));
-    q.index = 0; q.input = ''; q.correct = 0; q.state = 'idle';
+    q.problems = Array.from({length:app.settings.questionCount},()=>makeProblem(app.settings));
+    q.index=0; q.input=''; q.correct=0; q.startTime=Date.now();
     if (app.timer) clearTimeout(app.timer);
-    showQuiz();
+    showScreen('quiz');
     buildNumpad();
     renderQuiz();
   }
@@ -634,43 +711,32 @@
   function renderQuiz() {
     const q = app.quiz;
     const p = q.problems[q.index];
-    document.getElementById('quiz-counter').textContent =
-      `${q.index + 1} / ${app.settings.questionCount}`;
-    document.getElementById('problem-display').textContent =
-      `${p.a} ${p.sym} ${p.b}`;
-    const box = document.getElementById('answer-box');
-    box.textContent  = q.input;
-    box.className    = 'answer-box';
+    document.getElementById('quiz-counter').textContent = `${q.index+1} / ${app.settings.questionCount}`;
+    document.getElementById('problem-display').textContent = `${p.a} ${p.sym} ${p.b}`;
+    document.getElementById('answer-box').textContent = q.input;
   }
 
   function handleKey(k) {
     const q = app.quiz;
-
-    if (k === 'C') {
-      q.input = '';
-    } else if (k === 'BS') {
-      q.input = q.input.slice(0, -1);
-    } else {
-      if (q.input.length >= 7) return;
-      q.input += k;
-      const entered = parseInt(q.input, 10);
-      const p = q.problems[q.index];
-
-      if (entered === p.ans) {
-        q.correct++;
-        nextQuestion();
-        return;
-      }
+    if (k==='C') { q.input=''; }
+    else if (k==='BS') { q.input=q.input.slice(0,-1); }
+    else {
+      if (q.input.length>=7) return;
+      q.input+=k;
+      const entered=parseInt(q.input,10);
+      const p=q.problems[q.index];
+      if (entered===p.ans) { q.correct++; nextQuestion(); return; }
     }
     renderQuiz();
   }
 
   function nextQuestion() {
     const q = app.quiz;
-    q.input = '';
-    if (q.index + 1 >= app.settings.questionCount) {
-      document.getElementById('result-score').textContent =
-        `${q.correct} / ${app.settings.questionCount}`;
+    q.input='';
+    if (q.index+1>=app.settings.questionCount) {
+      const elapsed=(Date.now()-q.startTime)/1000;
+      recordResult(app.settings, q.correct, elapsed);
+      document.getElementById('result-score').textContent=`${q.correct} / ${app.settings.questionCount}`;
       $result.classList.add('open');
     } else {
       q.index++;
@@ -679,42 +745,33 @@
   }
 
   /* ── Events ── */
-  document.getElementById('btn-open-settings').addEventListener('click', startQuiz);
+  document.getElementById('btn-start').addEventListener('click', startQuiz);
+  document.getElementById('btn-records').addEventListener('click', ()=>showScreen('records'));
   document.getElementById('btn-begin').addEventListener('click', startQuiz);
-
-  document.getElementById('btn-quiz-close').addEventListener('click', () => {
-    if (app.timer) clearTimeout(app.timer);
-    showHome();
+  document.getElementById('btn-quiz-close').addEventListener('click', ()=>{
+    if (app.timer) clearTimeout(app.timer); showScreen('home'); });
+  document.getElementById('btn-prev').addEventListener('click', ()=>{
+    const q=app.quiz;
+    if (q.index>0){q.index--;q.input='';renderQuiz();}
   });
-  document.getElementById('btn-prev').addEventListener('click', () => {
-    const q = app.quiz;
-    if (q.index > 0) {
-      if (app.timer) clearTimeout(app.timer);
-      q.index--; q.input = ''; q.state = 'idle';
-      renderQuiz();
-    }
-  });
-  document.getElementById('btn-go-home').addEventListener('click', showHome);
-  document.getElementById('btn-retry').addEventListener('click', startQuiz);
-
-  $overlay.addEventListener('click', e => { if (e.target === $overlay) closeSettings(); });
-
-  document.getElementById('tabs-row').addEventListener('click', e => {
-    const chip = e.target.closest('.tab-chip');
-    if (!chip) return;
-    document.querySelectorAll('.tab-chip').forEach(c => c.classList.remove('sel'));
+  document.getElementById('btn-go-home').addEventListener('click',()=>{
+    $result.classList.remove('open'); showScreen('home'); });
+  document.getElementById('btn-retry').addEventListener('click',()=>{
+    $result.classList.remove('open'); startQuiz(); });
+  $overlay.addEventListener('click',e=>{if(e.target===$overlay)closeSettings();});
+  document.getElementById('tabs-row').addEventListener('click',e=>{
+    const chip=e.target.closest('.tab-chip');
+    if(!chip)return;
+    document.querySelectorAll('.tab-chip').forEach(c=>c.classList.remove('sel'));
     chip.classList.add('sel');
   });
 
-  // Initialize nav pill with default settings
+  /* ── Init ── */
   updateNavPill();
 
   /* ── PWA ── */
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () =>
-      navigator.serviceWorker.register('sw.js').catch(() => {})
-    );
-  }
+  if ('serviceWorker' in navigator)
+    window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
   </script>
 </body>
 </html>
