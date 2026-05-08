@@ -1,12 +1,12 @@
 {
-  "name": "Ninimaths",
-  "short_name": "Ninimaths",
-  "description": "暗算練習アプリ",
-  "start_url": "/",
+  "name": "英単語学習アプリ",
+  "short_name": "英単語",
+  "description": "英検対応英単語学習PWA（暗記カード・筆記モード）",
+  "start_url": "./",
   "display": "standalone",
-  "orientation": "portrait",
-  "background_color": "#EEEEEE",
-  "theme_color": "#2C6878",
+  "orientation": "portrait-primary",
+  "background_color": "#f1f5f9",
+  "theme_color": "#2563eb",
   "icons": [
     {
       "src": "icon.svg",
