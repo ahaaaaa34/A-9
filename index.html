@@ -156,7 +156,7 @@
   <div class="home-eyebrow">Health Quiz</div>
   <div class="home-title">ライフステージと健康</div>
   <div class="home-sub">第10章 赤シート式</div>
-  <div class="home-pill" id="home-pill">全 19 問</div>
+  <div class="home-pill" id="home-pill">全 22 問</div>
   <button class="btn-home-start" id="btn-start">スタート</button>
 </div>
 
@@ -165,7 +165,7 @@
   <div class="quiz-topbar">
     <button class="topbar-back" id="btn-back">‹</button>
     <div class="topbar-stats">
-      <div class="stat-chip hidden-chip">残 <span id="cnt-hidden">19</span></div>
+      <div class="stat-chip hidden-chip">残 <span id="cnt-hidden">22</span></div>
       <div class="stat-chip correct-chip">○ <span id="cnt-correct">0</span></div>
       <div class="stat-chip wrong-chip">× <span id="cnt-wrong">0</span></div>
     </div>
@@ -208,46 +208,34 @@
   座標は quiz_rot.jpg (2252×4000 portrait) の % で指定
   l=left%, t=top%, w=width%, h=height% (画像全体に対して)
 */
-// 座標はキャリブレーションツールで取得した実測値（quiz_rot.jpg の %）
-// l/t = 中心座標 - サイズ/2
 const ANSWERS = [
-  // ─── 問1-① ───
-  { id: 0,  label: "老化",            l: 35.9, t: 18.3, w: 10, h: 3.2 }, // cx:40.9 cy:19.8
-  { id: 1,  label: "個人差",          l: 79.4, t: 15.1, w: 12, h: 3.2 }, // cx:85.4 cy:16.6
-  { id: 2,  label: "ライフイベント",  l: 44.9, t: 20.8, w: 16, h: 3.2 }, // cx:52.9 cy:22.3
-
-  // ─── 問1-② ───
-  { id: 3,  label: "ライフステージ",  l: 18.6, t: 23.4, w: 18, h: 3.2 }, // cx:27.6 cy:24.9
-  { id: 4,  label: "（空欄）",        l: 17.5, t: 28.0, w: 14, h: 3.2 }, // cx:24.5 cy:29.5
-  { id: 5,  label: "母子保健法",      l: 66.7, t: 28.8, w: 14, h: 3.2 }, // cx:73.7 cy:30.3
-  { id: 6,  label: "学校保健安全法",  l: 19.6, t: 32.7, w: 18, h: 3.2 }, // cx:28.6 cy:34.2
-  { id: 7,  label: "（空欄）",        l: 81.8, t: 28.8, w: 14, h: 3.2 }, // cx:88.8 cy:30.3
-  { id: 8,  label: "保健活動",        l: 78.4, t: 32.4, w: 14, h: 3.2 }, // cx:85.4 cy:33.9
-  { id: 9,  label: "保健師",          l: 26.6, t: 35.2, w: 12, h: 3.2 }, // cx:32.6 cy:36.7
-  { id: 10, label: "（空欄）",        l: 80.5, t: 34.7, w: 14, h: 3.2 }, // cx:87.5 cy:36.2
-  { id: 11, label: "医療・介護",      l: 18.5, t: 39.7, w: 14, h: 3.2 }, // cx:25.5 cy:41.2
-
-  // ─── 問2-① ───
-  { id: 12, label: "①性成熟",        l: 17.7, t: 46.7, w: 14, h: 3.2 }, // cx:24.7 cy:48.2
-  { id: 13, label: "②妊娠",          l: 39.3, t: 46.0, w: 10, h: 3.2 }, // cx:44.3 cy:47.5
-  { id: 14, label: "③性感染症",      l: 57.3, t: 45.4, w: 14, h: 3.2 }, // cx:64.3 cy:46.9
-  { id: 15, label: "④避妊",          l: 79.1, t: 46.7, w: 10, h: 3.2 }, // cx:84.1 cy:48.2
-
-  // ─── 問2-② ───
-  { id: 16, label: "①過重労働",      l: 14.9, t: 51.3, w: 16, h: 3.2 }, // cx:22.9 cy:52.8
-  { id: 17, label: "②生活習慣病",    l: 40.4, t: 50.8, w: 14, h: 3.2 }, // cx:47.4 cy:52.3
-
-  // ─── 問2-③ ───
-  { id: 18, label: "①白内障",        l: 20.6, t: 56.7, w: 12, h: 3.2 }, // cx:26.6 cy:58.2
-  { id: 19, label: "②青光眼",        l: 40.4, t: 55.7, w: 12, h: 3.2 }, // cx:46.4 cy:57.2
-  { id: 20, label: "③骨粗鬆症",      l: 59.9, t: 54.7, w: 12, h: 3.2 }, // cx:65.9 cy:56.2
-  { id: 21, label: "④交通事故",      l: 83.6, t: 54.5, w: 12, h: 3.2 }, // cx:89.6 cy:56.0
+  { id:  0, label:"老化",           l:36.4, t:18.6, w: 9,  h:2.5 },
+  { id:  1, label:"個人差",         l:79.4, t:15.4, w:12,  h:2.5 },
+  { id:  2, label:"ライフイベント", l:44.9, t:21.1, w:16,  h:2.5 },
+  { id:  3, label:"ライフステージ", l:18.6, t:23.7, w:18,  h:2.8 },
+  { id:  4, label:"（空欄）",       l:17.5, t:28.2, w:14,  h:2.5 },
+  { id:  5, label:"母子保健法",     l:67.7, t:29.1, w:12,  h:2.5 },
+  { id:  7, label:"（空欄）",       l:84.8, t:29.1, w: 8,  h:2.5 },
+  { id:  6, label:"学校保健安全法", l:17.6, t:32.9, w:22,  h:2.5 },
+  { id:  8, label:"保健活動",       l:78.4, t:32.7, w:14,  h:2.5 },
+  { id:  9, label:"保健師",         l:26.6, t:35.5, w:12,  h:2.5 },
+  { id: 10, label:"（空欄）",       l:81.5, t:35.0, w:12,  h:2.5 },
+  { id: 11, label:"医療・介護",     l:18.5, t:39.9, w:14,  h:2.5 },
+  { id: 12, label:"①性成熟",       l:18.7, t:46.9, w:12,  h:2.5 },
+  { id: 13, label:"②妊娠",         l:39.3, t:46.3, w:10,  h:2.5 },
+  { id: 14, label:"③性感染症",     l:57.8, t:45.7, w:13,  h:2.5 },
+  { id: 15, label:"④避妊",         l:79.1, t:46.9, w:10,  h:2.5 },
+  { id: 16, label:"①過重労働",     l:14.9, t:51.6, w:16,  h:2.5 },
+  { id: 17, label:"②生活習慣病",   l:39.4, t:51.1, w:16,  h:2.5 },
+  { id: 18, label:"①白内障",       l:20.6, t:56.9, w:12,  h:2.5 },
+  { id: 19, label:"②青光眼",       l:40.4, t:55.9, w:12,  h:2.5 },
+  { id: 20, label:"③骨粗鬆症",     l:59.4, t:54.9, w:13,  h:2.5 },
+  { id: 21, label:"④交通事故",     l:83.1, t:54.6, w:13,  h:2.5 },
 ];
 
 // ── state ──
-// 各answerのstate: 'hidden'|'wrong'|'correct'
 let states = {};
-let retrySet = null; // null = full quiz, Set = retry only these ids
+let retrySet = null;
 
 const screens = {
   home:   document.getElementById('screen-home'),
@@ -260,12 +248,10 @@ function show(name) {
   screens[name].classList.add('active');
 }
 
-// ── 画像ロード後にオーバーレイ生成 ──
 const imgWrap = document.getElementById('img-wrap');
 const quizImg = document.getElementById('quiz-img');
 
 function buildOverlays() {
-  // 既存のオーバーレイをすべて削除
   imgWrap.querySelectorAll('.ans-overlay').forEach(el => el.remove());
 
   ANSWERS.forEach(ans => {
@@ -285,7 +271,6 @@ function buildOverlays() {
 
 function onOverlayTap(e) {
   const id = parseInt(e.currentTarget.dataset.id);
-  // リトライモードで対象外のものは無視
   if (retrySet !== null && !retrySet.has(id)) return;
 
   const cur = states[id];
@@ -294,7 +279,6 @@ function onOverlayTap(e) {
   } else if (cur === 'wrong') {
     states[id] = 'correct';
   } else {
-    // correct → wrong (取り消し可能)
     states[id] = 'wrong';
   }
   updateOverlayStates();
@@ -306,9 +290,8 @@ function updateOverlayStates() {
     const el = document.getElementById(`ov-${ans.id}`);
     if (!el) return;
     const st = states[ans.id];
-    // リトライモードで対象外 → 元のstateを維持
     if (retrySet !== null && !retrySet.has(ans.id)) {
-      el.dataset.state = 'correct'; // 正解済みとして青表示
+      el.dataset.state = 'correct';
     } else {
       el.dataset.state = st;
     }
@@ -333,16 +316,13 @@ function updateTopbar() {
   document.getElementById('cnt-wrong').textContent   = wrong;
 }
 
-// ── クイズ開始 ──
 function startQuiz(retry = null) {
   retrySet = retry;
 
-  // stateを初期化
   if (retry === null) {
     states = {};
     ANSWERS.forEach(a => { states[a.id] = 'hidden'; });
   } else {
-    // リトライ: 対象をhiddenに戻す
     retry.forEach(id => { states[id] = 'hidden'; });
   }
 
@@ -357,7 +337,6 @@ function startQuiz(retry = null) {
   updateTopbar();
 }
 
-// ── 結果表示 ──
 function showResult() {
   const active = retrySet !== null
     ? ANSWERS.filter(a => retrySet.has(a.id))
@@ -376,7 +355,6 @@ function showResult() {
   if (ng > 0) {
     btn.disabled = false;
     btn.textContent = `間違えた ${ng} 問を再挑戦`;
-    // 次回リトライセット
     btn.dataset.wrongIds = JSON.stringify(
       active.filter(a => states[a.id] !== 'correct').map(a => a.id)
     );
@@ -387,21 +365,15 @@ function showResult() {
   show('result');
 }
 
-// ── イベント ──
 document.getElementById('btn-start').addEventListener('click', () => startQuiz(null));
-
 document.getElementById('btn-done').addEventListener('click', showResult);
-
 document.getElementById('btn-back').addEventListener('click', () => show('home'));
-
 document.getElementById('btn-retry').addEventListener('click', function() {
   const ids = JSON.parse(this.dataset.wrongIds || '[]');
   if (ids.length > 0) startQuiz(new Set(ids));
 });
-
 document.getElementById('btn-home-from-result').addEventListener('click', () => show('home'));
 
-// ── PWA ──
 if ('serviceWorker' in navigator)
   window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
 </script>
