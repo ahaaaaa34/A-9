@@ -1,5 +1,5 @@
-const CACHE = 'health-quiz-v1';
-const ASSETS = ['/', '/index.html', '/manifest.json', '/icon.svg'];
+const CACHE = 'health-quiz-v2';
+const ASSETS = ['/', '/index.html', '/manifest.json', '/icon.svg', '/quiz_rot.jpg'];
 
 self.addEventListener('install', e => {
   e.waitUntil(

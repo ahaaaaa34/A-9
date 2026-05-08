@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#1A1A2E">
   <title>ライフステージと健康</title>
   <link rel="manifest" href="manifest.json">
@@ -10,13 +10,12 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="健康クイズ">
   <style>
-    *, *::before, *::after {
-      box-sizing: border-box; margin: 0; padding: 0;
-      -webkit-tap-highlight-color: transparent;
-    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html, body {
-      height: 100%; width: 100%; overflow: hidden;
-      font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Yu Gothic UI', sans-serif;
+      height: 100%; width: 100%;
+      font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', sans-serif;
+      background: #111;
+      overflow: hidden;
     }
 
     .screen { position: fixed; inset: 0; display: none; flex-direction: column; }
@@ -24,483 +23,382 @@
 
     /* ═══ HOME ═══ */
     #screen-home {
-      background: #1A1A2E;
-      align-items: center; justify-content: center;
-      gap: 20px; padding: 40px 28px;
+      background: linear-gradient(160deg, #1A1A2E 0%, #16213E 50%, #0F3460 100%);
+      align-items: center; justify-content: center; gap: 18px;
+      padding: 40px 28px;
     }
-    .home-badge {
-      font-size: 11px; font-weight: 700; letter-spacing: 2px;
-      color: rgba(255,255,255,0.45); text-transform: uppercase;
+    .home-eyebrow {
+      font-size: 11px; letter-spacing: 3px; font-weight: 700;
+      color: rgba(255,255,255,0.4); text-transform: uppercase;
     }
-    .home-title {
-      font-size: 26px; font-weight: 800; color: #fff;
-      text-align: center; line-height: 1.45;
+    .home-title { font-size: 28px; font-weight: 800; color: #fff; text-align: center; line-height: 1.4; }
+    .home-sub   { font-size: 13px; color: rgba(255,255,255,0.45); }
+    .home-pill {
+      background: rgba(255,255,255,0.08); border-radius: 999px;
+      padding: 8px 18px; font-size: 13px; color: rgba(255,255,255,0.7);
     }
-    .home-chapter {
-      font-size: 13px; color: rgba(255,255,255,0.5);
-    }
-    .home-divider {
-      width: 40px; height: 2px;
-      background: rgba(255,255,255,0.15); border-radius: 1px;
-    }
-    .home-count-wrap {
-      display: flex; gap: 20px;
-    }
-    .home-stat {
-      text-align: center;
-    }
-    .home-stat-num {
-      font-size: 28px; font-weight: 800; color: #fff;
-    }
-    .home-stat-lbl {
-      font-size: 11px; color: rgba(255,255,255,0.45); margin-top: 2px;
-    }
-    .btn-start {
-      margin-top: 8px;
-      width: 100%; max-width: 280px;
-      padding: 18px;
-      background: #E74C3C; color: #fff;
+    .btn-home-start {
+      margin-top: 10px; width: 100%; max-width: 280px;
+      padding: 18px; background: #E74C3C; color: #fff;
       border: none; border-radius: 18px;
-      font-size: 17px; font-weight: 700;
-      cursor: pointer; font-family: inherit;
-      transition: transform .1s, background .1s;
+      font-size: 17px; font-weight: 700; font-family: inherit;
+      cursor: pointer; transition: transform .1s, background .1s;
     }
-    .btn-start:active { transform: scale(0.97); background: #C0392B; }
+    .btn-home-start:active { transform: scale(0.97); background: #C0392B; }
 
     /* ═══ QUIZ ═══ */
-    #screen-quiz { background: #F2F2F7; }
+    #screen-quiz { background: #111; }
 
     .quiz-topbar {
+      position: relative; z-index: 10;
+      flex-shrink: 0;
+      background: rgba(17,17,17,0.9);
+      backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
       display: flex; align-items: center; justify-content: space-between;
-      padding: env(safe-area-inset-top, 48px) 16px 10px;
-      flex-shrink: 0;
+      padding: env(safe-area-inset-top, 44px) 14px 10px;
+      gap: 12px;
     }
-    .topbar-progress { font-size: 13px; font-weight: 600; color: #555; }
-    .topbar-close {
-      background: #E5E5EA; border: none; border-radius: 50%;
-      width: 30px; height: 30px;
+    .topbar-back {
+      background: rgba(255,255,255,0.1); border: none; border-radius: 50%;
+      width: 32px; height: 32px; flex-shrink: 0;
       display: flex; align-items: center; justify-content: center;
-      cursor: pointer; font-size: 14px; color: #555;
+      cursor: pointer; color: #fff; font-size: 18px; line-height: 1;
+    }
+    .topbar-stats {
+      flex: 1; display: flex; gap: 10px; align-items: center;
+    }
+    .stat-chip {
+      display: flex; align-items: center; gap: 4px;
+      font-size: 12px; font-weight: 700; padding: 4px 10px;
+      border-radius: 999px;
+    }
+    .stat-chip.hidden-chip  { background: rgba(231,76,60,0.25); color: #E74C3C; }
+    .stat-chip.correct-chip { background: rgba(46,134,193,0.25); color: #5DADE2; }
+    .stat-chip.wrong-chip   { background: rgba(231,76,60,0.15); color: #EC7063; }
+    .topbar-done {
+      background: #E74C3C; border: none; border-radius: 12px;
+      padding: 7px 14px; color: #fff;
+      font-size: 13px; font-weight: 700; font-family: inherit;
+      cursor: pointer; flex-shrink: 0;
     }
 
-    .progress-track {
-      height: 3px; background: #E0E0E0; flex-shrink: 0;
-      margin: 0 16px;
+    .img-scroll {
+      flex: 1; overflow-y: auto; overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
     }
-    .progress-fill {
-      height: 100%; background: #E74C3C; border-radius: 2px;
-      transition: width .3s cubic-bezier(.4,0,.2,1);
+    .img-wrap {
+      position: relative; width: 100%;
     }
-
-    .score-row {
-      display: flex; gap: 16px; padding: 10px 20px; flex-shrink: 0;
+    .quiz-img {
+      width: 100%; height: auto; display: block;
     }
-    .score-chip {
-      display: flex; align-items: center; gap: 5px;
-      font-size: 12px; font-weight: 700;
-    }
-    .chip-dot { width: 8px; height: 8px; border-radius: 50%; }
-    .chip-ok .chip-dot  { background: #2E86C1; }
-    .chip-ng .chip-dot  { background: #E74C3C; }
-    .chip-ok { color: #2E86C1; }
-    .chip-ng { color: #E74C3C; }
-
-    .card-area {
-      flex: 1; min-height: 0;
-      padding: 8px 16px 14px; display: flex; flex-direction: column;
-    }
-    .quiz-card {
-      background: #fff; border-radius: 22px;
-      flex: 1; display: flex; flex-direction: column;
-      overflow: hidden;
-      box-shadow: 0 1px 12px rgba(0,0,0,0.07);
-    }
-
-    .card-q {
-      flex: 1; padding: 28px 24px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 16px; line-height: 1.9; color: #111; text-align: center;
-    }
-    .card-sep { height: 1px; background: #F0F0F0; flex-shrink: 0; }
-
-    .card-a-wrap {
-      position: relative; flex-shrink: 0; min-height: 110px;
-      display: flex; align-items: center; justify-content: center;
-    }
-    .card-a {
-      padding: 22px 28px;
-      font-size: 22px; font-weight: 800; color: #111;
-      text-align: center; line-height: 1.5; width: 100%;
-    }
-    .answer-cover {
-      position: absolute; inset: 0;
-      border-radius: 0 0 22px 22px;
-      display: flex; align-items: center; justify-content: center;
+    .ans-overlay {
+      position: absolute;
+      border-radius: 3px;
       cursor: pointer;
-      transition: background .22s ease;
+      transition: background 0.2s ease;
+      display: flex; align-items: center; justify-content: center;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
     }
-    .answer-cover.state-hidden  { background: rgba(231,76,60,1); }
-    .answer-cover.state-wrong   { background: rgba(231,76,60,0.22); }
-    .answer-cover.state-correct { background: rgba(46,134,193,0.22); }
-    .cover-label {
-      font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.85);
-      transition: opacity .2s;
-      pointer-events: none;
+    .ans-overlay[data-state="hidden"] {
+      background: rgba(220, 45, 35, 0.93);
     }
-    .answer-cover.state-wrong .cover-label,
-    .answer-cover.state-correct .cover-label {
-      color: transparent;
+    .ans-overlay[data-state="wrong"] {
+      background: rgba(220, 45, 35, 0.20);
+      outline: 1.5px solid rgba(220,45,35,0.5);
     }
-
-    .quiz-footer {
-      padding: 10px 16px;
-      padding-bottom: calc(10px + env(safe-area-inset-bottom, 20px));
-      flex-shrink: 0;
+    .ans-overlay[data-state="correct"] {
+      background: rgba(40, 120, 190, 0.20);
+      outline: 1.5px solid rgba(40,120,190,0.5);
     }
-    .btn-next {
-      width: 100%; padding: 15px;
-      background: #1A1A2E; color: #fff;
-      border: none; border-radius: 16px;
-      font-size: 15px; font-weight: 700; font-family: inherit;
-      cursor: pointer; transition: background .1s;
-    }
-    .btn-next:active { background: #333; }
 
     /* ═══ RESULT ═══ */
     #screen-result {
-      background: #1A1A2E;
+      background: linear-gradient(160deg, #1A1A2E 0%, #0F3460 100%);
       align-items: center; justify-content: center;
       padding: 40px 28px; gap: 22px;
     }
-    .result-heading { font-size: 22px; font-weight: 800; color: #fff; }
+    .result-title { font-size: 22px; font-weight: 800; color: #fff; }
     .result-panel {
-      background: rgba(255,255,255,0.08);
-      border-radius: 22px; padding: 28px 36px;
-      text-align: center; width: 100%; max-width: 320px;
-    }
-    .result-pct {
-      font-size: 62px; font-weight: 800; color: #fff; line-height: 1;
-    }
-    .result-pct-lbl {
-      font-size: 13px; color: rgba(255,255,255,0.5); margin-top: 6px;
-    }
-    .result-nums {
-      display: flex; justify-content: center; gap: 28px; margin-top: 20px;
-    }
-    .result-num-item { text-align: center; }
-    .result-num-val { font-size: 28px; font-weight: 800; }
-    .result-num-lbl { font-size: 11px; color: rgba(255,255,255,0.45); margin-top: 3px; }
-    .col-ok { color: #5DADE2; }
-    .col-ng { color: #EC7063; }
-
-    .result-btn-area {
-      display: flex; flex-direction: column; gap: 10px;
+      background: rgba(255,255,255,0.07); border-radius: 22px;
+      padding: 28px 36px; text-align: center;
       width: 100%; max-width: 320px;
     }
-    .btn-retry-wrong {
-      padding: 16px; border-radius: 16px;
-      background: #E74C3C; color: #fff; border: none;
+    .result-pct { font-size: 66px; font-weight: 800; color: #fff; line-height: 1; }
+    .result-pct-sub { font-size: 13px; color: rgba(255,255,255,0.5); margin-top: 4px; }
+    .result-row { display: flex; justify-content: center; gap: 28px; margin-top: 18px; }
+    .result-item { text-align: center; }
+    .result-num { font-size: 28px; font-weight: 800; }
+    .result-lbl { font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 2px; }
+    .r-ok { color: #5DADE2; }
+    .r-ng { color: #EC7063; }
+    .result-actions { display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 320px; }
+    .btn-retry {
+      padding: 16px; border-radius: 16px; border: none;
+      background: #E74C3C; color: #fff;
       font-size: 15px; font-weight: 700; font-family: inherit; cursor: pointer;
     }
-    .btn-retry-wrong:active { background: #C0392B; }
-    .btn-retry-wrong:disabled { background: #444; color: rgba(255,255,255,0.35); cursor: default; }
-    .btn-back-home {
-      padding: 16px; border-radius: 16px;
-      background: rgba(255,255,255,0.1); color: #fff; border: none;
+    .btn-retry:active { background: #C0392B; }
+    .btn-retry:disabled { background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.3); cursor: default; }
+    .btn-home {
+      padding: 16px; border-radius: 16px; border: none;
+      background: rgba(255,255,255,0.1); color: #fff;
       font-size: 15px; font-weight: 700; font-family: inherit; cursor: pointer;
     }
-    .btn-back-home:active { background: rgba(255,255,255,0.18); }
+    .btn-home:active { background: rgba(255,255,255,0.18); }
   </style>
 </head>
 <body>
 
 <!-- HOME -->
 <div id="screen-home" class="screen active">
-  <div class="home-badge">Health Quiz</div>
+  <div class="home-eyebrow">Health Quiz</div>
   <div class="home-title">ライフステージと健康</div>
-  <div class="home-chapter">第10章 フラッシュカード</div>
-  <div class="home-divider"></div>
-  <div class="home-count-wrap">
-    <div class="home-stat">
-      <div class="home-stat-num" id="home-total">19</div>
-      <div class="home-stat-lbl">全問数</div>
-    </div>
-  </div>
-  <button class="btn-start" id="btn-start">スタート</button>
+  <div class="home-sub">第10章 赤シート式</div>
+  <div class="home-pill" id="home-pill">全 19 問</div>
+  <button class="btn-home-start" id="btn-start">スタート</button>
 </div>
 
 <!-- QUIZ -->
 <div id="screen-quiz" class="screen">
   <div class="quiz-topbar">
-    <div class="topbar-progress" id="topbar-progress">1 / 19</div>
-    <button class="topbar-close" id="btn-close">✕</button>
-  </div>
-  <div class="progress-track">
-    <div class="progress-fill" id="progress-fill" style="width:0%"></div>
-  </div>
-  <div class="score-row">
-    <div class="score-chip chip-ok">
-      <div class="chip-dot"></div>
-      <span id="cnt-ok">0</span> 正解
+    <button class="topbar-back" id="btn-back">‹</button>
+    <div class="topbar-stats">
+      <div class="stat-chip hidden-chip">残 <span id="cnt-hidden">19</span></div>
+      <div class="stat-chip correct-chip">○ <span id="cnt-correct">0</span></div>
+      <div class="stat-chip wrong-chip">× <span id="cnt-wrong">0</span></div>
     </div>
-    <div class="score-chip chip-ng">
-      <div class="chip-dot"></div>
-      <span id="cnt-ng">0</span> 不正解
-    </div>
+    <button class="topbar-done" id="btn-done">結果</button>
   </div>
-  <div class="card-area">
-    <div class="quiz-card">
-      <div class="card-q" id="card-q">―</div>
-      <div class="card-sep"></div>
-      <div class="card-a-wrap">
-        <div class="card-a" id="card-a">―</div>
-        <div class="answer-cover state-hidden" id="answer-cover">
-          <span class="cover-label" id="cover-label">タップして確認</span>
-        </div>
-      </div>
+  <div class="img-scroll" id="img-scroll">
+    <div class="img-wrap" id="img-wrap">
+      <img src="quiz_rot.jpg" class="quiz-img" id="quiz-img" alt="ライフステージと健康">
     </div>
-  </div>
-  <div class="quiz-footer">
-    <button class="btn-next" id="btn-next">次へ</button>
   </div>
 </div>
 
 <!-- RESULT -->
 <div id="screen-result" class="screen">
-  <div class="result-heading">結果</div>
+  <div class="result-title">結果</div>
   <div class="result-panel">
     <div class="result-pct" id="result-pct">0%</div>
-    <div class="result-pct-lbl">正答率</div>
-    <div class="result-nums">
-      <div class="result-num-item">
-        <div class="result-num-val col-ok" id="result-ok">0</div>
-        <div class="result-num-lbl">正解</div>
+    <div class="result-pct-sub">正答率</div>
+    <div class="result-row">
+      <div class="result-item">
+        <div class="result-num r-ok" id="res-ok">0</div>
+        <div class="result-lbl">正解</div>
       </div>
-      <div class="result-num-item">
-        <div class="result-num-val col-ng" id="result-ng">0</div>
-        <div class="result-num-lbl">不正解</div>
+      <div class="result-item">
+        <div class="result-num r-ng" id="res-ng">0</div>
+        <div class="result-lbl">不正解</div>
       </div>
     </div>
   </div>
-  <div class="result-btn-area">
-    <button class="btn-retry-wrong" id="btn-retry-wrong">間違えた問題を復習</button>
-    <button class="btn-back-home" id="btn-back-home">ホームへ戻る</button>
+  <div class="result-actions">
+    <button class="btn-retry" id="btn-retry">間違えた問題を再挑戦</button>
+    <button class="btn-home" id="btn-home-from-result">ホームへ戻る</button>
   </div>
 </div>
 
 <script>
 'use strict';
 
-const DATA = [
-  // ─── 問1-1 ───
-  {
-    q: "心や体はある年齢以降、発育・発達が止まり（　）が始まる。",
-    a: "老化"
-  },
-  {
-    q: "就学・就職・結婚・出産・育児・退職などの人生上の出来事を（　）という。",
-    a: "ライフイベント"
-  },
-  {
-    q: "ライフイベントには（　）があり、起こる時期は人それぞれ異なる。",
-    a: "個人差"
-  },
-  // ─── 問1-2 ───
-  {
-    q: "人の一生を乳幼児期・学童期・思春期・青年期・中年期・高年期などに分けたものを（　）という。",
-    a: "ライフステージ"
-  },
-  {
-    q: "乳幼児期・学童期の子どもの健康・福祉に関する法律の一つ（　）。",
-    a: "母子保健法"
-  },
-  {
-    q: "学童期の子どもの健康に関する法律の一つ（　）。",
-    a: "学校保健安全法"
-  },
-  {
-    q: "法律をもとに子どもの健康のために行われる活動を（　）という。",
-    a: "保健活動"
-  },
-  {
-    q: "保健活動の担い手となる専門職（　）。",
-    a: "保健師"
-  },
-  // ─── 問1-3 ───
-  {
-    q: "高齢者の医療の確保に関する法律・介護保険法により提供されるもの。",
-    a: "医療・介護"
-  },
-  // ─── 問2-1 性にかかわる課題 ───
-  {
-    q: "【性にかかわる課題 ①】\n学童期・思春期から青年期まで続く課題",
-    a: "性成熟"
-  },
-  {
-    q: "【性にかかわる課題 ②】\n学童期・思春期から青年期まで続く課題",
-    a: "妊娠"
-  },
-  {
-    q: "【性にかかわる課題 ③】\n学童期・思春期から青年期まで続く課題",
-    a: "性感染症"
-  },
-  {
-    q: "【性にかかわる課題 ④】\n学童期・思春期から青年期まで続く課題",
-    a: "避妊"
-  },
-  // ─── 問2-2 働く世代 ───
-  {
-    q: "【働く世代の健康課題 ①】\n働くことにかかわりで生じる健康課題",
-    a: "過重労働・ストレス"
-  },
-  {
-    q: "【働く世代の健康課題 ②】\n働くことにかかわりで生じる健康課題",
-    a: "生活習慣病"
-  },
-  // ─── 問2-3 高年期 ───
-  {
-    q: "【高年期の健康課題 ①】",
-    a: "白内障"
-  },
-  {
-    q: "【高年期の健康課題 ②】",
-    a: "青光眼（緑内障）"
-  },
-  {
-    q: "【高年期の健康課題 ③】",
-    a: "骨粗鬆症"
-  },
-  {
-    q: "【高年期の健康課題 ④】",
-    a: "交通事故・認知症"
-  }
+/*
+  座標は quiz_rot.jpg (2252×4000 portrait) の % で指定
+  l=left%, t=top%, w=width%, h=height% (画像全体に対して)
+*/
+const ANSWERS = [
+  // ─── 問1-① 老化・個人差・ライフイベント ───
+  { id: 0,  label: "老化",               l: 46, t:  9.5, w:  8, h: 3.2 },
+  { id: 1,  label: "個人差",             l: 64, t: 13.0, w:  9, h: 3.2 },
+  { id: 2,  label: "ライフイベント",     l: 11, t: 18.5, w: 18, h: 3.2 },
+
+  // ─── 問1-② ライフステージ関連 ───
+  { id: 3,  label: "ライフステージ",     l: 11, t: 25.5, w: 16, h: 3.2 },
+  { id: 4,  label: "母子保健法",         l: 44, t: 36.5, w: 13, h: 3.2 },
+  { id: 5,  label: "学校保健安全法",     l: 11, t: 41.5, w: 18, h: 3.2 },
+  { id: 6,  label: "保健活動",           l: 49, t: 46.0, w: 11, h: 3.2 },
+  { id: 7,  label: "保健師",             l: 11, t: 50.0, w:  9, h: 3.2 },
+
+  // ─── 問1-③ 医療・介護 ───
+  { id: 8,  label: "医療・介護",         l: 40, t: 54.5, w: 14, h: 3.2 },
+
+  // ─── 問2-① 学童期・思春期 ───
+  { id: 9,  label: "①性成熟",           l: 15, t: 65.5, w: 11, h: 3.2 },
+  { id: 10, label: "②妊娠",             l: 15, t: 69.0, w:  8, h: 3.2 },
+  { id: 11, label: "③性感染症",         l: 15, t: 72.5, w: 12, h: 3.2 },
+  { id: 12, label: "④避妊",             l: 15, t: 76.0, w:  8, h: 3.2 },
+
+  // ─── 問2-② 働く世代 ───
+  { id: 13, label: "①過重労働・ストレス", l: 15, t: 80.0, w: 20, h: 3.2 },
+  { id: 14, label: "②生活習慣病",       l: 15, t: 83.5, w: 14, h: 3.2 },
+
+  // ─── 問2-③ 高年期 ───
+  { id: 15, label: "①白内障",           l: 56, t: 65.5, w: 10, h: 3.2 },
+  { id: 16, label: "②青光眼",           l: 56, t: 69.0, w: 10, h: 3.2 },
+  { id: 17, label: "③骨粗鬆症",         l: 56, t: 72.5, w: 12, h: 3.2 },
+  { id: 18, label: "④交通事故・認知症", l: 56, t: 76.0, w: 16, h: 3.2 },
 ];
 
 // ── state ──
-let queue = [];
-let idx = 0;
-let state = 'hidden'; // hidden | wrong | correct
-let wrongSet = new Set();
+// 各answerのstate: 'hidden'|'wrong'|'correct'
+let states = {};
+let retrySet = null; // null = full quiz, Set = retry only these ids
 
-// ── DOM ──
 const screens = {
   home:   document.getElementById('screen-home'),
   quiz:   document.getElementById('screen-quiz'),
-  result: document.getElementById('screen-result')
+  result: document.getElementById('screen-result'),
 };
-const elQ       = document.getElementById('card-q');
-const elA       = document.getElementById('card-a');
-const elCover   = document.getElementById('answer-cover');
-const elLabel   = document.getElementById('cover-label');
-const elProg    = document.getElementById('topbar-progress');
-const elFill    = document.getElementById('progress-fill');
-const elCntOk   = document.getElementById('cnt-ok');
-const elCntNg   = document.getElementById('cnt-ng');
 
 function show(name) {
   Object.values(screens).forEach(s => s.classList.remove('active'));
   screens[name].classList.add('active');
 }
 
-function startQuiz(q) {
-  queue = q;
-  idx = 0;
-  wrongSet = new Set();
+// ── 画像ロード後にオーバーレイ生成 ──
+const imgWrap = document.getElementById('img-wrap');
+const quizImg = document.getElementById('quiz-img');
+
+function buildOverlays() {
+  // 既存のオーバーレイをすべて削除
+  imgWrap.querySelectorAll('.ans-overlay').forEach(el => el.remove());
+
+  ANSWERS.forEach(ans => {
+    const el = document.createElement('div');
+    el.className = 'ans-overlay';
+    el.id = `ov-${ans.id}`;
+    el.dataset.id = ans.id;
+    el.style.left   = `${ans.l}%`;
+    el.style.top    = `${ans.t}%`;
+    el.style.width  = `${ans.w}%`;
+    el.style.height = `${ans.h}%`;
+    el.addEventListener('click', onOverlayTap);
+    imgWrap.appendChild(el);
+  });
+  updateOverlayStates();
+}
+
+function onOverlayTap(e) {
+  const id = parseInt(e.currentTarget.dataset.id);
+  // リトライモードで対象外のものは無視
+  if (retrySet !== null && !retrySet.has(id)) return;
+
+  const cur = states[id];
+  if (cur === 'hidden') {
+    states[id] = 'wrong';
+  } else if (cur === 'wrong') {
+    states[id] = 'correct';
+  } else {
+    // correct → wrong (取り消し可能)
+    states[id] = 'wrong';
+  }
+  updateOverlayStates();
+  updateTopbar();
+}
+
+function updateOverlayStates() {
+  ANSWERS.forEach(ans => {
+    const el = document.getElementById(`ov-${ans.id}`);
+    if (!el) return;
+    const st = states[ans.id];
+    // リトライモードで対象外 → 元のstateを維持
+    if (retrySet !== null && !retrySet.has(ans.id)) {
+      el.dataset.state = 'correct'; // 正解済みとして青表示
+    } else {
+      el.dataset.state = st;
+    }
+  });
+}
+
+function updateTopbar() {
+  const active = retrySet !== null
+    ? ANSWERS.filter(a => retrySet.has(a.id))
+    : ANSWERS;
+
+  let hidden = 0, correct = 0, wrong = 0;
+  active.forEach(a => {
+    const s = states[a.id];
+    if      (s === 'hidden')  hidden++;
+    else if (s === 'correct') correct++;
+    else                      wrong++;
+  });
+
+  document.getElementById('cnt-hidden').textContent  = hidden;
+  document.getElementById('cnt-correct').textContent = correct;
+  document.getElementById('cnt-wrong').textContent   = wrong;
+}
+
+// ── クイズ開始 ──
+function startQuiz(retry = null) {
+  retrySet = retry;
+
+  // stateを初期化
+  if (retry === null) {
+    states = {};
+    ANSWERS.forEach(a => { states[a.id] = 'hidden'; });
+  } else {
+    // リトライ: 対象をhiddenに戻す
+    retry.forEach(id => { states[id] = 'hidden'; });
+  }
+
   show('quiz');
-  renderCard();
-}
+  document.getElementById('img-scroll').scrollTop = 0;
 
-function renderCard() {
-  const item = queue[idx];
-  const total = queue.length;
-
-  state = 'hidden';
-  elQ.textContent = item.q;
-  elA.textContent = item.a;
-  elCover.className = 'answer-cover state-hidden';
-  elLabel.textContent = 'タップして確認';
-
-  elProg.textContent = `${idx + 1} / ${total}`;
-  elFill.style.width = `${(idx / total) * 100}%`;
-
-  updateCounts();
-}
-
-function updateCounts() {
-  const answered = idx;
-  const ng = [...wrongSet].filter(i => i < answered).length;
-  const ok = answered - ng;
-  elCntOk.textContent = ok;
-  elCntNg.textContent = ng;
-}
-
-elCover.addEventListener('click', () => {
-  if (state === 'hidden') {
-    state = 'wrong';
-    elCover.className = 'answer-cover state-wrong';
-    elLabel.textContent = '正解なら再タップ →';
-    wrongSet.add(idx);
-    updateCounts();
-  } else if (state === 'wrong') {
-    state = 'correct';
-    elCover.className = 'answer-cover state-correct';
-    elLabel.textContent = '';
-    wrongSet.delete(idx);
-    updateCounts();
+  if (quizImg.complete && quizImg.naturalWidth > 0) {
+    buildOverlays();
   } else {
-    state = 'wrong';
-    elCover.className = 'answer-cover state-wrong';
-    elLabel.textContent = '正解なら再タップ →';
-    wrongSet.add(idx);
-    updateCounts();
+    quizImg.onload = buildOverlays;
   }
-});
+  updateTopbar();
+}
 
-document.getElementById('btn-next').addEventListener('click', () => {
-  if (state === 'hidden') wrongSet.add(idx);
-  idx++;
-  if (idx >= queue.length) {
-    showResult();
-  } else {
-    renderCard();
-  }
-});
-
+// ── 結果表示 ──
 function showResult() {
-  const total = queue.length;
-  const ng = wrongSet.size;
+  const active = retrySet !== null
+    ? ANSWERS.filter(a => retrySet.has(a.id))
+    : ANSWERS;
+
+  const total = active.length;
+  const ng = active.filter(a => states[a.id] !== 'correct').length;
   const ok = total - ng;
-  const pct = total > 0 ? Math.round((ok / total) * 100) : 0;
+  const pct = total > 0 ? Math.round(ok / total * 100) : 0;
 
   document.getElementById('result-pct').textContent = `${pct}%`;
-  document.getElementById('result-ok').textContent = ok;
-  document.getElementById('result-ng').textContent = ng;
+  document.getElementById('res-ok').textContent = ok;
+  document.getElementById('res-ng').textContent = ng;
 
-  const retryBtn = document.getElementById('btn-retry-wrong');
+  const btn = document.getElementById('btn-retry');
   if (ng > 0) {
-    retryBtn.disabled = false;
-    retryBtn.textContent = `間違えた ${ng} 問を復習`;
+    btn.disabled = false;
+    btn.textContent = `間違えた ${ng} 問を再挑戦`;
+    // 次回リトライセット
+    btn.dataset.wrongIds = JSON.stringify(
+      active.filter(a => states[a.id] !== 'correct').map(a => a.id)
+    );
   } else {
-    retryBtn.disabled = true;
-    retryBtn.textContent = '全問正解！🎉';
+    btn.disabled = true;
+    btn.textContent = '全問正解！🎉';
   }
   show('result');
 }
 
-document.getElementById('btn-start').addEventListener('click', () => {
-  startQuiz([...DATA]);
+// ── イベント ──
+document.getElementById('btn-start').addEventListener('click', () => startQuiz(null));
+
+document.getElementById('btn-done').addEventListener('click', showResult);
+
+document.getElementById('btn-back').addEventListener('click', () => show('home'));
+
+document.getElementById('btn-retry').addEventListener('click', function() {
+  const ids = JSON.parse(this.dataset.wrongIds || '[]');
+  if (ids.length > 0) startQuiz(new Set(ids));
 });
 
-document.getElementById('btn-retry-wrong').addEventListener('click', () => {
-  const wrongItems = [...wrongSet].sort((a,b) => a-b).map(i => queue[i]);
-  if (wrongItems.length > 0) startQuiz(wrongItems);
-});
+document.getElementById('btn-home-from-result').addEventListener('click', () => show('home'));
 
-document.getElementById('btn-back-home').addEventListener('click', () => show('home'));
-document.getElementById('btn-close').addEventListener('click', () => show('home'));
-
-document.getElementById('home-total').textContent = DATA.length;
-
+// ── PWA ──
 if ('serviceWorker' in navigator)
   window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
 </script>
