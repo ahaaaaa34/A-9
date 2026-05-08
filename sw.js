@@ -1,4 +1,4 @@
-const CACHE = 'ninimaths-v1';
+const CACHE = 'health-quiz-v1';
 const ASSETS = ['/', '/index.html', '/manifest.json', '/icon.svg'];
 
 self.addEventListener('install', e => {

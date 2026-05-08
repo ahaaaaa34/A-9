@@ -3,784 +3,506 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <meta name="theme-color" content="#2C6878">
-  <title>Mathix</title>
+  <meta name="theme-color" content="#1A1A2E">
+  <title>ライフステージと健康</title>
   <link rel="manifest" href="manifest.json">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="Mathix">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,300,0,0" rel="stylesheet">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="健康クイズ">
   <style>
     *, *::before, *::after {
       box-sizing: border-box; margin: 0; padding: 0;
       -webkit-tap-highlight-color: transparent;
-      touch-action: manipulation;
     }
-    html, body { height: 100%; width: 100%; overflow: hidden;
-      font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif; }
-    .material-symbols-outlined {
-      font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
-      line-height: 1; display: block; user-select: none; }
+    html, body {
+      height: 100%; width: 100%; overflow: hidden;
+      font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Yu Gothic UI', sans-serif;
+    }
 
-    /* ─── SCREENS ─── */
     .screen { position: fixed; inset: 0; display: none; flex-direction: column; }
     .screen.active { display: flex; }
 
-    /* ════════════════ HOME ════════════════ */
-    #screen-home { background: #EEEEEE; }
-
-    .home-inner {
-      flex: 1; min-height: 0;
-      display: flex; flex-direction: column;
-      padding: env(safe-area-inset-top, 44px) 16px 0;
-      overflow: hidden;
+    /* ═══ HOME ═══ */
+    #screen-home {
+      background: #1A1A2E;
+      align-items: center; justify-content: center;
+      gap: 20px; padding: 40px 28px;
+    }
+    .home-badge {
+      font-size: 11px; font-weight: 700; letter-spacing: 2px;
+      color: rgba(255,255,255,0.45); text-transform: uppercase;
     }
     .home-title {
-      font-size: 34px; font-weight: 800;
-      text-align: center; color: #1A1A1A;
-      padding: 18px 0 22px; flex-shrink: 0;
+      font-size: 26px; font-weight: 800; color: #fff;
+      text-align: center; line-height: 1.45;
     }
-    .home-content {
-      flex: 1; min-height: 0;
-      display: flex; flex-direction: column; gap: 12px;
-      padding-bottom: 4px;
+    .home-chapter {
+      font-size: 13px; color: rgba(255,255,255,0.5);
     }
+    .home-divider {
+      width: 40px; height: 2px;
+      background: rgba(255,255,255,0.15); border-radius: 1px;
+    }
+    .home-count-wrap {
+      display: flex; gap: 20px;
+    }
+    .home-stat {
+      text-align: center;
+    }
+    .home-stat-num {
+      font-size: 28px; font-weight: 800; color: #fff;
+    }
+    .home-stat-lbl {
+      font-size: 11px; color: rgba(255,255,255,0.45); margin-top: 2px;
+    }
+    .btn-start {
+      margin-top: 8px;
+      width: 100%; max-width: 280px;
+      padding: 18px;
+      background: #E74C3C; color: #fff;
+      border: none; border-radius: 18px;
+      font-size: 17px; font-weight: 700;
+      cursor: pointer; font-family: inherit;
+      transition: transform .1s, background .1s;
+    }
+    .btn-start:active { transform: scale(0.97); background: #C0392B; }
 
-    .card {
-      background: #fff; border-radius: 24px;
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      gap: 8px; cursor: pointer;
-      user-select: none; -webkit-user-select: none;
-      transition: transform .1s ease;
-    }
-    .card:active { transform: scale(0.96); }
-    .card-icon { font-size: 28px; color: #1A1A1A; }
-    .card-label { font-size: 14px; font-weight: 700; color: #1A1A1A; }
+    /* ═══ QUIZ ═══ */
+    #screen-quiz { background: #F2F2F7; }
 
-    /* Records card (above Start) */
-    .card-records { height: 110px; flex-shrink: 0; }
-
-    /* Start card */
-    .card-start { flex: 1; min-height: 150px; }
-    .start-circle {
-      width: 84px; height: 84px; border-radius: 50%;
-      border: 3px solid #2C6878;
-      display: flex; align-items: center; justify-content: center;
-      margin-bottom: 16px;
-    }
-    .start-arrow {
-      font-size: 44px; color: #2C6878;
-      font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 48;
-    }
-    .start-label { font-size: 26px; font-weight: 700; color: #2C6878; }
-
-    /* Bottom nav (home) */
-    .bottom-nav {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 10px 24px;
-      padding-bottom: calc(10px + env(safe-area-inset-bottom, 16px));
-      flex-shrink: 0;
-    }
-    .nav-icon-btn {
-      background: none; border: none; padding: 8px;
-      cursor: pointer; color: #888; display: flex;
-    }
-    .nav-icon-btn.active-nav { color: #2C6878; }
-    .nav-pill {
-      background: #fff; border-radius: 50px;
-      padding: 8px 18px;
-      display: flex; align-items: center; gap: 10px;
-      cursor: pointer; user-select: none;
-      transition: background .12s;
-    }
-    .nav-pill:active { background: #F0F0F0; }
-    .nav-dots { font-size: 12px; color: #888; letter-spacing: 3px; min-width: 20px; text-align: center; }
-    .nav-op-circle {
-      width: 32px; height: 32px; background: #1A1A1A;
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 16px; font-weight: 700; color: #fff; flex-shrink: 0;
-    }
-
-    /* ════════════════ RECORDS SCREEN ════════════════ */
-    #screen-records { background: #EEEEEE; }
-
-    .records-inner {
-      flex: 1; min-height: 0; overflow-y: auto;
-      padding: env(safe-area-inset-top, 44px) 16px 0;
-      display: flex; flex-direction: column;
-    }
-    .records-title {
-      font-size: 20px; font-weight: 800;
-      text-align: center; color: #1A1A1A;
-      padding: 18px 0 16px; flex-shrink: 0;
-    }
-    .records-card {
-      background: #fff; border-radius: 24px;
-      padding: 20px 20px 8px;
-      flex-shrink: 0;
-      overflow: hidden;
-    }
-    .section-label {
-      font-size: 12px; color: #999;
-      margin: 4px 0 8px; padding-left: 4px;
-    }
-    .section-label:not(:first-child) { margin-top: 20px; }
-
-    .record-row {
-      display: flex; align-items: center;
-      gap: 14px; padding: 10px 4px;
-      border-bottom: 1px solid #F5F5F5;
-    }
-    .record-row:last-child { border-bottom: none; }
-
-    .rec-icon-wrap {
-      width: 28px; height: 28px; flex-shrink: 0;
-      display: flex; align-items: center; justify-content: center;
-    }
-    .rec-icon-wrap .material-symbols-outlined { font-size: 22px; color: #2C6878; }
-    .rec-op-circle {
-      width: 28px; height: 28px; border-radius: 50%;
-      border: 1.5px solid #2C6878;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 14px; font-weight: 700; color: #2C6878;
-      flex-shrink: 0;
-    }
-    .rec-name { flex: 1; font-size: 15px; color: #1A1A1A; }
-    .rec-value { font-size: 16px; font-weight: 800; color: #1A1A1A; }
-
-    .daily-btn {
-      background: #fff; border-radius: 20px;
-      margin: 12px 0 8px;
-      padding: 18px; text-align: center;
-      font-size: 16px; font-weight: 700; color: #1A1A1A;
-      cursor: pointer; flex-shrink: 0;
-    }
-    .daily-btn:active { background: #F5F5F5; }
-
-    .rec-empty { font-size: 13px; color: #bbb; padding: 12px 4px; }
-
-    /* Bottom nav (records) */
-    .records-nav { background: #EEEEEE; }
-
-    /* ════════════════ SETTINGS OVERLAY ════════════════ */
-    #settings-overlay {
-      position: fixed; inset: 0;
-      background: rgba(0,0,0,.45);
-      display: none; align-items: flex-end;
-      z-index: 200;
-      backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
-    }
-    #settings-overlay.open { display: flex; }
-    .bottom-sheet {
-      background: #F3F3F3; border-radius: 28px 28px 0 0;
-      width: 100%;
-      padding: 0 20px calc(28px + env(safe-area-inset-bottom, 0px));
-      max-height: 92vh; overflow-y: auto;
-      transform: translateY(100%);
-      transition: transform .35s cubic-bezier(.32,.72,0,1);
-    }
-    .bottom-sheet.open { transform: translateY(0); }
-    .sheet-handle {
-      width: 36px; height: 4px; background: #ccc;
-      border-radius: 2px; margin: 10px auto 18px;
-    }
-    .sheet-title {
-      font-size: 18px; font-weight: 700;
-      text-align: center; color: #1A1A1A; margin-bottom: 18px;
-    }
-    .tabs-row { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
-    .tab-chip {
-      background: #fff; border: none; border-radius: 50px;
-      padding: 8px 14px; font-size: 13px;
-      font-family: inherit; cursor: pointer;
-      color: #1A1A1A; font-weight: 400; transition: background .15s;
-    }
-    .tab-chip:first-child { color: #999; }
-    .tab-chip.sel { background: #DCDCDC; font-weight: 700; }
-    .summary-card {
-      background: #fff; border-radius: 16px;
-      padding: 16px 12px; text-align: center;
-      font-size: 16px; font-weight: 700; color: #2C6878; margin-bottom: 12px;
-    }
-    .selector-card {
-      background: #fff; border-radius: 16px;
-      padding: 8px 4px; margin-bottom: 8px;
-      display: flex; justify-content: space-evenly; align-items: center;
-    }
-    .dot-cell {
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      gap: 4px; padding: 10px 10px;
-      min-width: 48px; border-radius: 12px;
-      cursor: pointer; user-select: none; transition: background .12s;
-    }
-    .dot-cell.sel { background: #2C6878; }
-    .dot-lbl { font-size: 10px; font-weight: 700; color: #fff; display: none; }
-    .dot-cell.sel .dot-lbl { display: block; }
-    .op-cell {
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      gap: 4px; padding: 8px 10px;
-      min-width: 48px; border-radius: 12px;
-      cursor: pointer; user-select: none; transition: background .12s;
-    }
-    .op-cell.sel { background: #2C6878; }
-    .op-circle {
-      width: 38px; height: 38px; border-radius: 50%;
-      border: 1.5px solid #ccc;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 20px; font-weight: 700; color: #1A1A1A;
-      transition: border-color .12s, color .12s;
-    }
-    .op-cell.sel .op-circle { border-color: rgba(255,255,255,.7); color: #fff; }
-    .op-lbl { font-size: 10px; font-weight: 700; color: #fff; display: none; }
-    .op-cell.sel .op-lbl { display: block; }
-    .sheet-start-btn {
-      width: 100%; padding: 16px; background: #2C6878; color: #fff;
-      border: none; border-radius: 16px;
-      font-size: 16px; font-weight: 700; font-family: inherit;
-      cursor: pointer; margin-top: 20px; transition: background .15s;
-    }
-    .sheet-start-btn:active { background: #1E4E5A; }
-
-    /* ════════════════ QUIZ ════════════════ */
-    #screen-quiz { background: #fff; }
     .quiz-topbar {
       display: flex; align-items: center; justify-content: space-between;
-      padding: env(safe-area-inset-top, 44px) 8px 10px;
-      border-bottom: 1px solid #eee; flex-shrink: 0;
+      padding: env(safe-area-inset-top, 48px) 16px 10px;
+      flex-shrink: 0;
     }
-    .topbar-side { display: flex; align-items: center; }
-    .topbar-counter { font-size: 14px; color: #888; }
-    .icon-btn {
-      background: none; border: none; padding: 8px;
-      cursor: pointer; color: #1A1A1A;
+    .topbar-progress { font-size: 13px; font-weight: 600; color: #555; }
+    .topbar-close {
+      background: #E5E5EA; border: none; border-radius: 50%;
+      width: 30px; height: 30px;
       display: flex; align-items: center; justify-content: center;
+      cursor: pointer; font-size: 14px; color: #555;
     }
-    .quiz-workspace {
-      flex: 1; min-height: 0;
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: flex-end;
-      padding: 24px 24px 28px; background: #fff;
-    }
-    .problem-display {
-      font-size: 50px; font-weight: 300; color: #1A1A1A;
-      letter-spacing: 2px; text-align: center; margin-bottom: 24px;
-    }
-    .answer-row { display: flex; align-items: center; gap: 12px; }
-    .prev-btn {
-      background: none; border: none; cursor: pointer;
-      padding: 4px; display: flex; align-items: center; color: #888;
-    }
-    .answer-box {
-      width: 200px; height: 52px;
-      border: 1.5px solid #ccc; border-radius: 8px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 28px; font-weight: 300; color: #1A1A1A;
-      background: #fff; letter-spacing: 2px;
-    }
-    .quiz-divider { height: 1px; background: #eee; flex-shrink: 0; }
-    .numpad { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; flex-shrink: 0; }
-    .numpad-key {
-      height: 68px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 22px; font-weight: 400; color: #1A1A1A;
-      border: .5px solid #eee; cursor: pointer;
-      user-select: none; -webkit-user-select: none;
-      background: #fff; transition: background .08s;
-    }
-    .numpad-key:active { background: #F5F5F5; }
-    .numpad-key.empty { background: #F6F6F6; cursor: default; }
-    .numpad-key.empty:active { background: #F6F6F6; }
-    .numpad-bottom { height: env(safe-area-inset-bottom, 0px); background: #fff; flex-shrink: 0; }
 
-    /* ════════════════ RESULT ════════════════ */
-    #result-overlay {
-      position: fixed; inset: 0; background: #fff;
-      display: none; flex-direction: column;
-      align-items: center; justify-content: center; z-index: 300;
+    .progress-track {
+      height: 3px; background: #E0E0E0; flex-shrink: 0;
+      margin: 0 16px;
     }
-    #result-overlay.open { display: flex; }
-    .result-title { font-size: 24px; font-weight: 700; color: #1A1A1A; margin-bottom: 28px; }
-    .result-score { font-size: 68px; font-weight: 700; color: #2C6878; line-height: 1; }
-    .result-sub { font-size: 16px; color: #888; margin-top: 10px; margin-bottom: 52px; }
-    .result-actions { display: flex; gap: 16px; }
-    .btn-outline {
-      padding: 14px 28px; background: transparent;
-      border: 1.5px solid #2C6878; border-radius: 14px;
-      color: #2C6878; font-size: 15px; font-weight: 600;
-      cursor: pointer; font-family: inherit;
+    .progress-fill {
+      height: 100%; background: #E74C3C; border-radius: 2px;
+      transition: width .3s cubic-bezier(.4,0,.2,1);
     }
-    .btn-outline:active { background: #EBF3F5; }
-    .btn-filled {
-      padding: 14px 28px; background: #2C6878; border: none;
-      border-radius: 14px; color: #fff;
-      font-size: 15px; font-weight: 600;
-      cursor: pointer; font-family: inherit;
+
+    .score-row {
+      display: flex; gap: 16px; padding: 10px 20px; flex-shrink: 0;
     }
-    .btn-filled:active { background: #1E4E5A; }
+    .score-chip {
+      display: flex; align-items: center; gap: 5px;
+      font-size: 12px; font-weight: 700;
+    }
+    .chip-dot { width: 8px; height: 8px; border-radius: 50%; }
+    .chip-ok .chip-dot  { background: #2E86C1; }
+    .chip-ng .chip-dot  { background: #E74C3C; }
+    .chip-ok { color: #2E86C1; }
+    .chip-ng { color: #E74C3C; }
+
+    .card-area {
+      flex: 1; min-height: 0;
+      padding: 8px 16px 14px; display: flex; flex-direction: column;
+    }
+    .quiz-card {
+      background: #fff; border-radius: 22px;
+      flex: 1; display: flex; flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 1px 12px rgba(0,0,0,0.07);
+    }
+
+    .card-q {
+      flex: 1; padding: 28px 24px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; line-height: 1.9; color: #111; text-align: center;
+    }
+    .card-sep { height: 1px; background: #F0F0F0; flex-shrink: 0; }
+
+    .card-a-wrap {
+      position: relative; flex-shrink: 0; min-height: 110px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .card-a {
+      padding: 22px 28px;
+      font-size: 22px; font-weight: 800; color: #111;
+      text-align: center; line-height: 1.5; width: 100%;
+    }
+    .answer-cover {
+      position: absolute; inset: 0;
+      border-radius: 0 0 22px 22px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      transition: background .22s ease;
+    }
+    .answer-cover.state-hidden  { background: rgba(231,76,60,1); }
+    .answer-cover.state-wrong   { background: rgba(231,76,60,0.22); }
+    .answer-cover.state-correct { background: rgba(46,134,193,0.22); }
+    .cover-label {
+      font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.85);
+      transition: opacity .2s;
+      pointer-events: none;
+    }
+    .answer-cover.state-wrong .cover-label,
+    .answer-cover.state-correct .cover-label {
+      color: transparent;
+    }
+
+    .quiz-footer {
+      padding: 10px 16px;
+      padding-bottom: calc(10px + env(safe-area-inset-bottom, 20px));
+      flex-shrink: 0;
+    }
+    .btn-next {
+      width: 100%; padding: 15px;
+      background: #1A1A2E; color: #fff;
+      border: none; border-radius: 16px;
+      font-size: 15px; font-weight: 700; font-family: inherit;
+      cursor: pointer; transition: background .1s;
+    }
+    .btn-next:active { background: #333; }
+
+    /* ═══ RESULT ═══ */
+    #screen-result {
+      background: #1A1A2E;
+      align-items: center; justify-content: center;
+      padding: 40px 28px; gap: 22px;
+    }
+    .result-heading { font-size: 22px; font-weight: 800; color: #fff; }
+    .result-panel {
+      background: rgba(255,255,255,0.08);
+      border-radius: 22px; padding: 28px 36px;
+      text-align: center; width: 100%; max-width: 320px;
+    }
+    .result-pct {
+      font-size: 62px; font-weight: 800; color: #fff; line-height: 1;
+    }
+    .result-pct-lbl {
+      font-size: 13px; color: rgba(255,255,255,0.5); margin-top: 6px;
+    }
+    .result-nums {
+      display: flex; justify-content: center; gap: 28px; margin-top: 20px;
+    }
+    .result-num-item { text-align: center; }
+    .result-num-val { font-size: 28px; font-weight: 800; }
+    .result-num-lbl { font-size: 11px; color: rgba(255,255,255,0.45); margin-top: 3px; }
+    .col-ok { color: #5DADE2; }
+    .col-ng { color: #EC7063; }
+
+    .result-btn-area {
+      display: flex; flex-direction: column; gap: 10px;
+      width: 100%; max-width: 320px;
+    }
+    .btn-retry-wrong {
+      padding: 16px; border-radius: 16px;
+      background: #E74C3C; color: #fff; border: none;
+      font-size: 15px; font-weight: 700; font-family: inherit; cursor: pointer;
+    }
+    .btn-retry-wrong:active { background: #C0392B; }
+    .btn-retry-wrong:disabled { background: #444; color: rgba(255,255,255,0.35); cursor: default; }
+    .btn-back-home {
+      padding: 16px; border-radius: 16px;
+      background: rgba(255,255,255,0.1); color: #fff; border: none;
+      font-size: 15px; font-weight: 700; font-family: inherit; cursor: pointer;
+    }
+    .btn-back-home:active { background: rgba(255,255,255,0.18); }
   </style>
 </head>
 <body>
 
-  <!-- ══ HOME ══ -->
-  <div id="screen-home" class="screen active">
-    <div class="home-inner">
-      <h1 class="home-title">Mathix</h1>
-      <div class="home-content">
-        <!-- Records card -->
-        <div class="card card-records" id="btn-records">
-          <span class="material-symbols-outlined card-icon">schedule</span>
-          <span class="card-label">記録</span>
-        </div>
-        <!-- Start card -->
-        <div class="card card-start" id="btn-start">
-          <div class="start-circle">
-            <span class="material-symbols-outlined start-arrow">arrow_upward</span>
-          </div>
-          <span class="start-label">Start</span>
+<!-- HOME -->
+<div id="screen-home" class="screen active">
+  <div class="home-badge">Health Quiz</div>
+  <div class="home-title">ライフステージと健康</div>
+  <div class="home-chapter">第10章 フラッシュカード</div>
+  <div class="home-divider"></div>
+  <div class="home-count-wrap">
+    <div class="home-stat">
+      <div class="home-stat-num" id="home-total">19</div>
+      <div class="home-stat-lbl">全問数</div>
+    </div>
+  </div>
+  <button class="btn-start" id="btn-start">スタート</button>
+</div>
+
+<!-- QUIZ -->
+<div id="screen-quiz" class="screen">
+  <div class="quiz-topbar">
+    <div class="topbar-progress" id="topbar-progress">1 / 19</div>
+    <button class="topbar-close" id="btn-close">✕</button>
+  </div>
+  <div class="progress-track">
+    <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+  </div>
+  <div class="score-row">
+    <div class="score-chip chip-ok">
+      <div class="chip-dot"></div>
+      <span id="cnt-ok">0</span> 正解
+    </div>
+    <div class="score-chip chip-ng">
+      <div class="chip-dot"></div>
+      <span id="cnt-ng">0</span> 不正解
+    </div>
+  </div>
+  <div class="card-area">
+    <div class="quiz-card">
+      <div class="card-q" id="card-q">―</div>
+      <div class="card-sep"></div>
+      <div class="card-a-wrap">
+        <div class="card-a" id="card-a">―</div>
+        <div class="answer-cover state-hidden" id="answer-cover">
+          <span class="cover-label" id="cover-label">タップして確認</span>
         </div>
       </div>
     </div>
-    <nav class="bottom-nav">
-      <button class="nav-icon-btn" id="home-nav-bookmark" onclick="showScreen('records')">
-        <span class="material-symbols-outlined">bookmark</span>
-      </button>
-      <div class="nav-pill" id="nav-pill" onclick="openSettings()">
-        <span class="nav-dots" id="nav-dots-left">•••</span>
-        <div class="nav-op-circle" id="nav-op-circle">×</div>
-        <span class="nav-dots" id="nav-dots-right">•</span>
-      </div>
-      <button class="nav-icon-btn">
-        <span class="material-symbols-outlined">menu</span>
-      </button>
-    </nav>
   </div>
-
-  <!-- ══ RECORDS ══ -->
-  <div id="screen-records" class="screen">
-    <div class="records-inner">
-      <h1 class="records-title">記録</h1>
-      <div class="records-card">
-
-        <div class="section-label">プレイデータ</div>
-        <div class="record-row">
-          <div class="rec-icon-wrap"><span class="material-symbols-outlined">check</span></div>
-          <span class="rec-name">解いた数</span>
-          <span class="rec-value" id="stat-solved">0</span>
-        </div>
-        <div class="record-row">
-          <div class="rec-icon-wrap"><span class="material-symbols-outlined">person</span></div>
-          <span class="rec-name">プレイヤーレベル</span>
-          <span class="rec-value" id="stat-level">1</span>
-        </div>
-        <div class="record-row">
-          <div class="rec-icon-wrap"><span class="material-symbols-outlined">favorite</span></div>
-          <span class="rec-name">ポイント</span>
-          <span class="rec-value" id="stat-points">0</span>
-        </div>
-
-        <div class="section-label">ハイスコア</div>
-        <div class="record-row">
-          <div class="rec-op-circle">+</div>
-          <span class="rec-name">足し算</span>
-          <span class="rec-value" id="hs-add">0</span>
-        </div>
-        <div class="record-row">
-          <div class="rec-op-circle">−</div>
-          <span class="rec-name">引き算</span>
-          <span class="rec-value" id="hs-subtract">0</span>
-        </div>
-        <div class="record-row">
-          <div class="rec-op-circle">×</div>
-          <span class="rec-name">掛け算</span>
-          <span class="rec-value" id="hs-multiply">0</span>
-        </div>
-        <div class="record-row">
-          <div class="rec-op-circle">÷</div>
-          <span class="rec-name">割り算</span>
-          <span class="rec-value" id="hs-divide">0</span>
-        </div>
-        <div class="record-row">
-          <div class="rec-op-circle">◎</div>
-          <span class="rec-name">ミックス</span>
-          <span class="rec-value" id="hs-mix">0</span>
-        </div>
-
-        <div class="section-label">ベストタイム（1問あたりの時間）</div>
-        <div id="best-times-list"></div>
-
-      </div>
-      <div class="daily-btn">日毎の記録</div>
-    </div>
-    <nav class="bottom-nav records-nav">
-      <button class="nav-icon-btn active-nav">
-        <span class="material-symbols-outlined">bookmark</span>
-      </button>
-      <button class="nav-icon-btn" onclick="showScreen('home')">
-        <span class="material-symbols-outlined">home</span>
-      </button>
-      <button class="nav-icon-btn">
-        <span class="material-symbols-outlined">menu</span>
-      </button>
-    </nav>
+  <div class="quiz-footer">
+    <button class="btn-next" id="btn-next">次へ</button>
   </div>
+</div>
 
-  <!-- ══ QUIZ ══ -->
-  <div id="screen-quiz" class="screen">
-    <header class="quiz-topbar">
-      <div class="topbar-side">
-        <button class="icon-btn" id="btn-quiz-close">
-          <span class="material-symbols-outlined">close</span>
-        </button>
+<!-- RESULT -->
+<div id="screen-result" class="screen">
+  <div class="result-heading">結果</div>
+  <div class="result-panel">
+    <div class="result-pct" id="result-pct">0%</div>
+    <div class="result-pct-lbl">正答率</div>
+    <div class="result-nums">
+      <div class="result-num-item">
+        <div class="result-num-val col-ok" id="result-ok">0</div>
+        <div class="result-num-lbl">正解</div>
       </div>
-      <span class="topbar-counter" id="quiz-counter">1 / 100</span>
-      <div class="topbar-side">
-        <button class="icon-btn">
-          <span class="material-symbols-outlined">keyboard_double_arrow_up</span>
-        </button>
-        <button class="icon-btn">
-          <span class="material-symbols-outlined">fullscreen</span>
-        </button>
-      </div>
-    </header>
-    <div class="quiz-workspace">
-      <div class="problem-display" id="problem-display">329 × 4</div>
-      <div class="answer-row">
-        <button class="prev-btn" id="btn-prev">
-          <span class="material-symbols-outlined" style="font-size:30px">chevron_left</span>
-        </button>
-        <div class="answer-box" id="answer-box"></div>
+      <div class="result-num-item">
+        <div class="result-num-val col-ng" id="result-ng">0</div>
+        <div class="result-num-lbl">不正解</div>
       </div>
     </div>
-    <div class="quiz-divider"></div>
-    <div class="numpad" id="numpad"></div>
-    <div class="numpad-bottom"></div>
   </div>
-
-  <!-- ══ SETTINGS ══ -->
-  <div id="settings-overlay">
-    <div class="bottom-sheet" id="settings-sheet">
-      <div class="sheet-handle"></div>
-      <h2 class="sheet-title">暗算の設定</h2>
-      <div class="tabs-row" id="tabs-row">
-        <button class="tab-chip" data-idx="0">EXモード</button>
-        <button class="tab-chip sel" data-idx="1">筆算表示</button>
-        <button class="tab-chip" data-idx="2">キーパッド</button>
-        <button class="tab-chip" data-idx="3">その他</button>
-      </div>
-      <div class="summary-card" id="settings-summary"></div>
-      <div class="selector-card" id="sel-count"></div>
-      <div class="selector-card" id="sel-first"></div>
-      <div class="selector-card" id="sel-second"></div>
-      <div class="selector-card" id="sel-ops"></div>
-      <button class="sheet-start-btn" id="btn-begin">始める</button>
-    </div>
+  <div class="result-btn-area">
+    <button class="btn-retry-wrong" id="btn-retry-wrong">間違えた問題を復習</button>
+    <button class="btn-back-home" id="btn-back-home">ホームへ戻る</button>
   </div>
+</div>
 
-  <!-- ══ RESULT ══ -->
-  <div id="result-overlay">
-    <div class="result-title">結果</div>
-    <div class="result-score" id="result-score">0 / 0</div>
-    <div class="result-sub">正解</div>
-    <div class="result-actions">
-      <button class="btn-outline" id="btn-go-home">ホーム</button>
-      <button class="btn-filled"  id="btn-retry">もう一度</button>
-    </div>
-  </div>
+<script>
+'use strict';
 
-  <script>
-  'use strict';
-
-  /* ── State ── */
-  const app = {
-    settings: { firstDigits: 3, secondDigits: 1, operation: 'multiply', questionCount: 100 },
-    quiz:     { problems: [], index: 0, input: '', correct: 0, startTime: 0 },
-    timer:    null
-  };
-
-  const Q_COUNTS = [10, 25, 50, 75, 100];
-  const DIGITS   = [1, 2, 3, 4, 5];
-  const OPS = [
-    { id:'add',      sym:'+', label:'足し算' },
-    { id:'subtract', sym:'−', label:'引き算' },
-    { id:'multiply', sym:'×', label:'掛け算' },
-    { id:'divide',   sym:'÷', label:'割り算' },
-    { id:'mix',      sym:'◎', label:'ミックス' }
-  ];
-
-  /* ── DOM ── */
-  const $screens  = {};
-  ['home','records','quiz'].forEach(id => $screens[id] = document.getElementById('screen-' + id));
-  const $overlay  = document.getElementById('settings-overlay');
-  const $sheet    = document.getElementById('settings-sheet');
-  const $result   = document.getElementById('result-overlay');
-
-  /* ── Navigation ── */
-  function showScreen(name) {
-    Object.values($screens).forEach(s => s.classList.remove('active'));
-    $screens[name].classList.add('active');
-    if (name === 'records') renderRecords();
+const DATA = [
+  // ─── 問1-1 ───
+  {
+    q: "心や体はある年齢以降、発育・発達が止まり（　）が始まる。",
+    a: "老化"
+  },
+  {
+    q: "就学・就職・結婚・出産・育児・退職などの人生上の出来事を（　）という。",
+    a: "ライフイベント"
+  },
+  {
+    q: "ライフイベントには（　）があり、起こる時期は人それぞれ異なる。",
+    a: "個人差"
+  },
+  // ─── 問1-2 ───
+  {
+    q: "人の一生を乳幼児期・学童期・思春期・青年期・中年期・高年期などに分けたものを（　）という。",
+    a: "ライフステージ"
+  },
+  {
+    q: "乳幼児期・学童期の子どもの健康・福祉に関する法律の一つ（　）。",
+    a: "母子保健法"
+  },
+  {
+    q: "学童期の子どもの健康に関する法律の一つ（　）。",
+    a: "学校保健安全法"
+  },
+  {
+    q: "法律をもとに子どもの健康のために行われる活動を（　）という。",
+    a: "保健活動"
+  },
+  {
+    q: "保健活動の担い手となる専門職（　）。",
+    a: "保健師"
+  },
+  // ─── 問1-3 ───
+  {
+    q: "高齢者の医療の確保に関する法律・介護保険法により提供されるもの。",
+    a: "医療・介護"
+  },
+  // ─── 問2-1 性にかかわる課題 ───
+  {
+    q: "【性にかかわる課題 ①】\n学童期・思春期から青年期まで続く課題",
+    a: "性成熟"
+  },
+  {
+    q: "【性にかかわる課題 ②】\n学童期・思春期から青年期まで続く課題",
+    a: "妊娠"
+  },
+  {
+    q: "【性にかかわる課題 ③】\n学童期・思春期から青年期まで続く課題",
+    a: "性感染症"
+  },
+  {
+    q: "【性にかかわる課題 ④】\n学童期・思春期から青年期まで続く課題",
+    a: "避妊"
+  },
+  // ─── 問2-2 働く世代 ───
+  {
+    q: "【働く世代の健康課題 ①】\n働くことにかかわりで生じる健康課題",
+    a: "過重労働・ストレス"
+  },
+  {
+    q: "【働く世代の健康課題 ②】\n働くことにかかわりで生じる健康課題",
+    a: "生活習慣病"
+  },
+  // ─── 問2-3 高年期 ───
+  {
+    q: "【高年期の健康課題 ①】",
+    a: "白内障"
+  },
+  {
+    q: "【高年期の健康課題 ②】",
+    a: "青光眼（緑内障）"
+  },
+  {
+    q: "【高年期の健康課題 ③】",
+    a: "骨粗鬆症"
+  },
+  {
+    q: "【高年期の健康課題 ④】",
+    a: "交通事故・認知症"
   }
-  function openSettings() {
-    $overlay.classList.add('open');
-    requestAnimationFrame(() => $sheet.classList.add('open'));
-    renderSettings();
+];
+
+// ── state ──
+let queue = [];
+let idx = 0;
+let state = 'hidden'; // hidden | wrong | correct
+let wrongSet = new Set();
+
+// ── DOM ──
+const screens = {
+  home:   document.getElementById('screen-home'),
+  quiz:   document.getElementById('screen-quiz'),
+  result: document.getElementById('screen-result')
+};
+const elQ       = document.getElementById('card-q');
+const elA       = document.getElementById('card-a');
+const elCover   = document.getElementById('answer-cover');
+const elLabel   = document.getElementById('cover-label');
+const elProg    = document.getElementById('topbar-progress');
+const elFill    = document.getElementById('progress-fill');
+const elCntOk   = document.getElementById('cnt-ok');
+const elCntNg   = document.getElementById('cnt-ng');
+
+function show(name) {
+  Object.values(screens).forEach(s => s.classList.remove('active'));
+  screens[name].classList.add('active');
+}
+
+function startQuiz(q) {
+  queue = q;
+  idx = 0;
+  wrongSet = new Set();
+  show('quiz');
+  renderCard();
+}
+
+function renderCard() {
+  const item = queue[idx];
+  const total = queue.length;
+
+  state = 'hidden';
+  elQ.textContent = item.q;
+  elA.textContent = item.a;
+  elCover.className = 'answer-cover state-hidden';
+  elLabel.textContent = 'タップして確認';
+
+  elProg.textContent = `${idx + 1} / ${total}`;
+  elFill.style.width = `${(idx / total) * 100}%`;
+
+  updateCounts();
+}
+
+function updateCounts() {
+  const answered = idx;
+  const ng = [...wrongSet].filter(i => i < answered).length;
+  const ok = answered - ng;
+  elCntOk.textContent = ok;
+  elCntNg.textContent = ng;
+}
+
+elCover.addEventListener('click', () => {
+  if (state === 'hidden') {
+    state = 'wrong';
+    elCover.className = 'answer-cover state-wrong';
+    elLabel.textContent = '正解なら再タップ →';
+    wrongSet.add(idx);
+    updateCounts();
+  } else if (state === 'wrong') {
+    state = 'correct';
+    elCover.className = 'answer-cover state-correct';
+    elLabel.textContent = '';
+    wrongSet.delete(idx);
+    updateCounts();
+  } else {
+    state = 'wrong';
+    elCover.className = 'answer-cover state-wrong';
+    elLabel.textContent = '正解なら再タップ →';
+    wrongSet.add(idx);
+    updateCounts();
   }
-  function closeSettings() {
-    $sheet.classList.remove('open');
-    setTimeout(() => $overlay.classList.remove('open'), 350);
+});
+
+document.getElementById('btn-next').addEventListener('click', () => {
+  if (state === 'hidden') wrongSet.add(idx);
+  idx++;
+  if (idx >= queue.length) {
+    showResult();
+  } else {
+    renderCard();
   }
+});
 
-  /* ── Stats (localStorage) ── */
-  const STATS_KEY = 'mathix-stats';
-  function defaultStats() {
-    return { totalSolved: 0, points: 0,
-      highScores: { add:0, subtract:0, multiply:0, divide:0, mix:0 },
-      bestTimes: {} };
+function showResult() {
+  const total = queue.length;
+  const ng = wrongSet.size;
+  const ok = total - ng;
+  const pct = total > 0 ? Math.round((ok / total) * 100) : 0;
+
+  document.getElementById('result-pct').textContent = `${pct}%`;
+  document.getElementById('result-ok').textContent = ok;
+  document.getElementById('result-ng').textContent = ng;
+
+  const retryBtn = document.getElementById('btn-retry-wrong');
+  if (ng > 0) {
+    retryBtn.disabled = false;
+    retryBtn.textContent = `間違えた ${ng} 問を復習`;
+  } else {
+    retryBtn.disabled = true;
+    retryBtn.textContent = '全問正解！🎉';
   }
-  function loadStats() {
-    try { const s = localStorage.getItem(STATS_KEY); return s ? JSON.parse(s) : defaultStats(); }
-    catch { return defaultStats(); }
-  }
-  function saveStats(s) {
-    try { localStorage.setItem(STATS_KEY, JSON.stringify(s)); } catch {}
-  }
-  function getLevel(n) { return Math.floor(n / 100) + 1; }
+  show('result');
+}
 
-  function recordResult(settings, correct, elapsedSec) {
-    const stats = loadStats();
-    stats.totalSolved += correct;
-    stats.points      += correct;
-    const opId = settings.operation;
-    if (correct > (stats.highScores[opId] || 0)) stats.highScores[opId] = correct;
-    if (correct > 0 && elapsedSec > 0) {
-      const tpq = elapsedSec / settings.questionCount;
-      const key = `${settings.firstDigits}_${settings.secondDigits}_${opId}`;
-      if (!stats.bestTimes[key] || tpq < stats.bestTimes[key]) stats.bestTimes[key] = tpq;
-    }
-    saveStats(stats);
-  }
+document.getElementById('btn-start').addEventListener('click', () => {
+  startQuiz([...DATA]);
+});
 
-  /* ── Records rendering ── */
-  function renderRecords() {
-    const s = loadStats();
-    document.getElementById('stat-solved').textContent = s.totalSolved;
-    document.getElementById('stat-level').textContent  = getLevel(s.totalSolved);
-    document.getElementById('stat-points').textContent = s.points;
-    ['add','subtract','multiply','divide','mix'].forEach(id => {
-      const el = document.getElementById('hs-' + id);
-      if (el) el.textContent = s.highScores[id] || 0;
-    });
-    const btList = document.getElementById('best-times-list');
-    const entries = Object.entries(s.bestTimes);
-    if (entries.length === 0) {
-      btList.innerHTML = '<div class="rec-empty">まだ記録なし</div>';
-    } else {
-      btList.innerHTML = '';
-      entries.forEach(([key, secs]) => {
-        const [fd, sd, opId] = key.split('_');
-        const op = OPS.find(o => o.id === opId);
-        if (!op) return;
-        const row = document.createElement('div');
-        row.className = 'record-row';
-        row.innerHTML = `
-          <div class="rec-op-circle">${op.sym}</div>
-          <span class="rec-name">${fd}桁と${sd}桁の${op.label}</span>
-          <span class="rec-value">${secs.toFixed(2)}秒</span>`;
-        btList.appendChild(row);
-      });
-    }
-  }
+document.getElementById('btn-retry-wrong').addEventListener('click', () => {
+  const wrongItems = [...wrongSet].sort((a,b) => a-b).map(i => queue[i]);
+  if (wrongItems.length > 0) startQuiz(wrongItems);
+});
 
-  /* ── Settings rendering ── */
-  function updateNavPill() {
-    const s = app.settings;
-    const op = OPS.find(o => o.id === s.operation);
-    document.getElementById('nav-dots-left').textContent  = '•'.repeat(s.firstDigits);
-    document.getElementById('nav-op-circle').textContent  = op ? op.sym : '×';
-    document.getElementById('nav-dots-right').textContent = '•'.repeat(s.secondDigits);
-  }
+document.getElementById('btn-back-home').addEventListener('click', () => show('home'));
+document.getElementById('btn-close').addEventListener('click', () => show('home'));
 
-  function dotSVG(idx, color) {
-    const r = 2.8;
-    const p = [[[12,12]],[[7,12],[17,12]],[[4,12],[12,12],[20,12]],
-               [[7,7],[17,7],[7,17],[17,17]],
-               [[5.5,5.5],[18.5,5.5],[12,12],[5.5,18.5],[18.5,18.5]]];
-    const circles = p[Math.min(idx,4)]
-      .map(([x,y]) => `<circle cx="${x}" cy="${y}" r="${r}" fill="${color}"/>`)
-      .join('');
-    return `<svg width="24" height="24" viewBox="0 0 24 24">${circles}</svg>`;
-  }
+document.getElementById('home-total').textContent = DATA.length;
 
-  function renderSelectorRow(id, options, selected, suffix, onChange) {
-    const el = document.getElementById(id);
-    el.innerHTML = '';
-    options.forEach((val, i) => {
-      const isSel = val === selected;
-      const cell = document.createElement('div');
-      cell.className = 'dot-cell' + (isSel ? ' sel' : '');
-      cell.innerHTML = dotSVG(i, isSel ? '#fff' : '#999');
-      if (isSel) {
-        const lbl = document.createElement('div');
-        lbl.className = 'dot-lbl';
-        lbl.textContent = val + suffix;
-        cell.appendChild(lbl);
-      }
-      cell.addEventListener('click', () => { onChange(val); renderSettings(); });
-      el.appendChild(cell);
-    });
-  }
-
-  function renderOps() {
-    const el = document.getElementById('sel-ops');
-    el.innerHTML = '';
-    OPS.forEach(op => {
-      const isSel = app.settings.operation === op.id;
-      const cell  = document.createElement('div');
-      cell.className = 'op-cell' + (isSel ? ' sel' : '');
-      cell.innerHTML = `<div class="op-circle">${op.sym}</div>` +
-        (isSel ? `<div class="op-lbl">${op.label}</div>` : '');
-      cell.addEventListener('click', () => { app.settings.operation = op.id; renderSettings(); });
-      el.appendChild(cell);
-    });
-  }
-
-  function renderSettings() {
-    const s = app.settings;
-    const opLabel = OPS.find(o => o.id === s.operation)?.label ?? '';
-    document.getElementById('settings-summary').textContent =
-      `${s.firstDigits}桁 と ${s.secondDigits}桁 の ${opLabel} を ${s.questionCount}問`;
-    renderSelectorRow('sel-count',  Q_COUNTS, s.questionCount, '問', v => app.settings.questionCount = v);
-    renderSelectorRow('sel-first',  DIGITS,   s.firstDigits,   '桁', v => app.settings.firstDigits   = v);
-    renderSelectorRow('sel-second', DIGITS,   s.secondDigits,  '桁', v => app.settings.secondDigits  = v);
-    renderOps();
-    updateNavPill();
-  }
-
-  /* ── Problem generation ── */
-  const ri = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
-
-  function makeProblem(s) {
-    const minA = Math.pow(10, s.firstDigits  - 1) | 0;
-    const maxA = Math.pow(10, s.firstDigits)  - 1 | 0;
-    const minB = Math.pow(10, s.secondDigits - 1) | 0;
-    const maxB = Math.pow(10, s.secondDigits) - 1 | 0;
-    let op = s.operation;
-    if (op === 'mix') op = ['add','subtract','multiply'][ri(0,2)];
-    switch (op) {
-      case 'add': { const a=ri(minA,maxA),b=ri(minB,maxB); return{a,b,sym:'+',ans:a+b}; }
-      case 'subtract': {
-        const a=ri(minA,maxA), bMax=Math.min(maxB,a);
-        const b=bMax>=minB?ri(minB,bMax):0; return{a,b,sym:'−',ans:a-b}; }
-      case 'multiply': { const a=ri(minA,maxA),b=ri(minB,maxB); return{a,b,sym:'×',ans:a*b}; }
-      case 'divide': {
-        const b=ri(minB,maxB), qMin=Math.max(1,(minA/b)|0), qMax=(maxA/b)|0;
-        const q=qMin<=qMax?ri(qMin,qMax):1; return{a:q*b,b,sym:'÷',ans:q}; }
-      default: { const a=ri(minA,maxA),b=ri(minB,maxB); return{a,b,sym:'×',ans:a*b}; }
-    }
-  }
-
-  /* ── Quiz ── */
-  function buildNumpad() {
-    const pad = document.getElementById('numpad');
-    pad.innerHTML = '';
-    [[null,'1','2','3'],[null,'4','5','6'],[null,'7','8','9'],[null,'C','0','BS']]
-      .forEach(row => row.forEach(k => {
-        const cell = document.createElement('div');
-        cell.className = 'numpad-key' + (k===null?' empty':'');
-        if (k!==null) { cell.textContent=k; cell.addEventListener('click',()=>handleKey(k)); }
-        pad.appendChild(cell);
-      }));
-  }
-
-  function startQuiz() {
-    closeSettings();
-    const q = app.quiz;
-    q.problems = Array.from({length:app.settings.questionCount},()=>makeProblem(app.settings));
-    q.index=0; q.input=''; q.correct=0; q.startTime=Date.now();
-    if (app.timer) clearTimeout(app.timer);
-    showScreen('quiz');
-    buildNumpad();
-    renderQuiz();
-  }
-
-  function renderQuiz() {
-    const q = app.quiz;
-    const p = q.problems[q.index];
-    document.getElementById('quiz-counter').textContent = `${q.index+1} / ${app.settings.questionCount}`;
-    document.getElementById('problem-display').textContent = `${p.a} ${p.sym} ${p.b}`;
-    document.getElementById('answer-box').textContent = q.input;
-  }
-
-  function handleKey(k) {
-    const q = app.quiz;
-    if (k==='C') { q.input=''; }
-    else if (k==='BS') { q.input=q.input.slice(0,-1); }
-    else {
-      if (q.input.length>=7) return;
-      q.input+=k;
-      const entered=parseInt(q.input,10);
-      const p=q.problems[q.index];
-      if (entered===p.ans) { q.correct++; nextQuestion(); return; }
-    }
-    renderQuiz();
-  }
-
-  function nextQuestion() {
-    const q = app.quiz;
-    q.input='';
-    if (q.index+1>=app.settings.questionCount) {
-      const elapsed=(Date.now()-q.startTime)/1000;
-      recordResult(app.settings, q.correct, elapsed);
-      document.getElementById('result-score').textContent=`${q.correct} / ${app.settings.questionCount}`;
-      $result.classList.add('open');
-    } else {
-      q.index++;
-      renderQuiz();
-    }
-  }
-
-  /* ── Events ── */
-  document.getElementById('btn-start').addEventListener('click', startQuiz);
-  document.getElementById('btn-records').addEventListener('click', ()=>showScreen('records'));
-  document.getElementById('btn-begin').addEventListener('click', startQuiz);
-  document.getElementById('btn-quiz-close').addEventListener('click', ()=>{
-    if (app.timer) clearTimeout(app.timer); showScreen('home'); });
-  document.getElementById('btn-prev').addEventListener('click', ()=>{
-    const q=app.quiz;
-    if (q.index>0){q.index--;q.input='';renderQuiz();}
-  });
-  document.getElementById('btn-go-home').addEventListener('click',()=>{
-    $result.classList.remove('open'); showScreen('home'); });
-  document.getElementById('btn-retry').addEventListener('click',()=>{
-    $result.classList.remove('open'); startQuiz(); });
-  $overlay.addEventListener('click',e=>{if(e.target===$overlay)closeSettings();});
-  document.getElementById('tabs-row').addEventListener('click',e=>{
-    const chip=e.target.closest('.tab-chip');
-    if(!chip)return;
-    document.querySelectorAll('.tab-chip').forEach(c=>c.classList.remove('sel'));
-    chip.classList.add('sel');
-  });
-
-  /* ── Keyboard input ── */
-  document.addEventListener('keydown', e => {
-    if ($screens.quiz.classList.contains('active') && !$result.classList.contains('open')) {
-      if (e.key >= '0' && e.key <= '9') handleKey(e.key);
-      else if (e.key === 'Backspace') handleKey('BS');
-      else if (e.key === 'Escape' || e.key === 'c' || e.key === 'C') handleKey('C');
-    }
-  });
-
-  /* ── Init ── */
-  updateNavPill();
-
-  /* ── PWA ── */
-  if ('serviceWorker' in navigator)
-    window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
-  </script>
+if ('serviceWorker' in navigator)
+  window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+</script>
 </body>
 </html>
