@@ -766,6 +766,15 @@
     chip.classList.add('sel');
   });
 
+  /* ── Keyboard input ── */
+  document.addEventListener('keydown', e => {
+    if ($screens.quiz.classList.contains('active') && !$result.classList.contains('open')) {
+      if (e.key >= '0' && e.key <= '9') handleKey(e.key);
+      else if (e.key === 'Backspace') handleKey('BS');
+      else if (e.key === 'Escape' || e.key === 'c' || e.key === 'C') handleKey('C');
+    }
+  });
+
   /* ── Init ── */
   updateNavPill();
 
